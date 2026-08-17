@@ -1,156 +1,220 @@
 # 🎓 Automated Attendance System
 
-An AI-powered **Automated Attendance System** designed to simplify student attendance management using **Face Recognition, OpenCV, Flask, and SQLite**.
+> **AI-powered student attendance management using Face Recognition, OpenCV, Flask, and SQLite.**
 
-The system allows administrators/teachers to register students, capture their facial data, recognize registered students through a camera, and automatically record attendance.
+An intelligent and automated attendance management system designed to reduce the time and effort required for traditional manual attendance.
 
----
-
-## 📌 Project Overview
-
-Traditional attendance systems require teachers to manually mark attendance, which can be time-consuming and may lead to errors.
-
-This project provides an automated solution using **facial recognition technology**.
-
-When a registered student's face is detected through the camera, the system identifies the student and can record their attendance automatically.
-
-### 🎯 Main Goal
-
-To develop a simple, reliable, and user-friendly attendance system that reduces manual work and improves attendance management.
+The system combines **Computer Vision, Face Recognition, Web Development, and Database Management** to identify registered students and manage attendance efficiently.
 
 ---
 
-## 🎯 Problem Statement
+## 🌟 Project Highlights
 
-Manual attendance systems have several limitations:
-
-* ⏱️ Time-consuming attendance process
-* ❌ Possibility of human errors
-* 📝 Manual record maintenance
-* 🔄 Difficult to manage large numbers of students
-* 📊 Attendance reporting requires additional manual work
-
-The proposed system addresses these problems using computer vision and automated attendance recording.
+* 🤖 AI-based face recognition
+* 📷 Real-time camera-based student identification
+* 👨‍🎓 Student registration and management
+* 📝 Automated attendance recording
+* 📊 Attendance and attendance-report management
+* 🌐 Flask-based web dashboard
+* 🗄️ SQLite database
+* 🔐 Local handling of biometric-related data
+* 💻 Simple and user-friendly interface
 
 ---
 
-## 💡 Proposed Solution
+# 📸 Application Screenshots
 
-The system uses **OpenCV-based face detection and recognition** to identify registered students.
+## 🏠 Dashboard
 
-### Basic workflow
+![Automated Attendance System Dashboard](screenshots/dashboard.png.png)
+
+---
+
+## 👨‍🎓 Student Management
+
+![Student Management](screenshots/student-management.png.png)
+
+---
+
+## 📝 Attendance
+
+![Attendance](screenshots/attendance.png.png)
+
+---
+
+## 📊 Attendance Report
+
+![Attendance Report](screenshots/attendance-report.png.png)
+
+---
+
+# 📌 Project Overview
+
+Traditional attendance systems require teachers to manually record the presence of students. This can be time-consuming, especially when managing a large number of students.
+
+The **Automated Attendance System** provides a computer-vision-based solution where registered students can be identified through a camera and their attendance can be recorded automatically.
+
+The project is developed as an academic implementation demonstrating the practical application of **Artificial Intelligence and Computer Vision** in education.
+
+---
+
+# 🎯 Problem Statement
+
+Traditional manual attendance systems have several challenges:
+
+* ⏱️ Attendance takes valuable classroom time
+* ❌ Manual entry can lead to errors
+* 📝 Records require additional maintenance
+* 🔄 Managing attendance for multiple students is difficult
+* 📊 Generating attendance reports manually takes time
+* 👨‍🏫 Teachers need to spend time on repetitive administrative tasks
+
+### Proposed Solution
+
+Use **Face Detection and Face Recognition** to automatically identify registered students and manage their attendance through a web-based system.
+
+---
+
+# 💡 How the System Works
 
 ```text
-Student Registration
-        ↓
-Face Registration
-        ↓
-Face Model Training
-        ↓
-Camera Captures Face
-        ↓
-Face Detection
-        ↓
-Face Recognition
-        ↓
-Student Identification
-        ↓
-Attendance Recording
-        ↓
-Attendance Reports
+                    ┌─────────────────────┐
+                    │   Student Register  │
+                    └──────────┬──────────┘
+                               ↓
+                    ┌─────────────────────┐
+                    │  Face Registration  │
+                    └──────────┬──────────┘
+                               ↓
+                    ┌─────────────────────┐
+                    │   Train Face Model  │
+                    └──────────┬──────────┘
+                               ↓
+                    ┌─────────────────────┐
+                    │   Camera Captures   │
+                    │        Face         │
+                    └──────────┬──────────┘
+                               ↓
+                    ┌─────────────────────┐
+                    │   Face Detection    │
+                    └──────────┬──────────┘
+                               ↓
+                    ┌─────────────────────┐
+                    │  Face Recognition   │
+                    └──────────┬──────────┘
+                               ↓
+                    ┌─────────────────────┐
+                    │ Student Identified  │
+                    └──────────┬──────────┘
+                               ↓
+                    ┌─────────────────────┐
+                    │ Attendance Recorded │
+                    └──────────┬──────────┘
+                               ↓
+                    ┌─────────────────────┐
+                    │ Attendance Reports  │
+                    └─────────────────────┘
 ```
 
 ---
 
 # ⚙️ Features
 
-### 👨‍🎓 Student Management
+## 👨‍🎓 Student Management
 
-* Add new students
-* Store student information
+* Add student details
 * View registered students
 * Manage student records
+* Associate students with unique IDs
 
-### 📷 Face Registration
+## 📷 Face Registration
 
-* Capture student's face using a camera
-* Store facial training images locally
-* Associate facial data with student ID
+* Capture student facial images using a camera
+* Store training images locally
+* Associate captured facial data with the corresponding student ID
 
-### 🧠 Face Recognition
+## 🧠 Face Recognition
 
 * Detect faces using OpenCV
-* Recognize registered students
-* Identify student ID
+* Recognize previously registered students
+* Identify the corresponding student ID
 * Display recognition confidence
 
-### 📝 Automatic Attendance
+## 📝 Automated Attendance
 
-* Identify students through camera
+* Identify students through the camera
 * Record attendance automatically
-* Prevent unnecessary duplicate attendance entries
+* Store attendance date and time
+* Avoid unnecessary duplicate attendance entries
 
-### 📊 Attendance Management
+## 📊 Attendance Reports
 
-* Store attendance records
-* Maintain date and time information
-* Generate attendance information for future reporting
+* View attendance records
+* Maintain attendance history
+* Display attendance information in an organized format
 
-### 🌐 Web Dashboard
+## 🌐 Web Dashboard
 
-* Flask-based web interface
-* Student management dashboard
-* Simple and user-friendly interface
+* Flask-powered web interface
+* Centralized dashboard
+* Student management interface
+* Attendance management interface
 
 ---
 
 # 🧠 Technologies Used
 
-| Technology | Purpose                        |
-| ---------- | ------------------------------ |
-| 🐍 Python  | Core programming language      |
-| 🌐 Flask   | Web application framework      |
-| 👁️ OpenCV | Face detection and recognition |
-| 🗄️ SQLite | Database management            |
-| HTML       | Web page structure             |
-| CSS        | User interface styling         |
-| JavaScript | Frontend interactions          |
-| Git        | Version control                |
-| GitHub     | Source code hosting            |
+| Technology       | Usage                          |
+| ---------------- | ------------------------------ |
+| 🐍 **Python**    | Core application development   |
+| 🌐 **Flask**     | Web application framework      |
+| 👁️ **OpenCV**   | Face detection and recognition |
+| 🗄️ **SQLite**   | Database management            |
+| 🌐 **HTML**      | Web page structure             |
+| 🎨 **CSS**       | User interface design          |
+| ⚡ **JavaScript** | Frontend functionality         |
+| 🔧 **Git**       | Version control                |
+| ☁️ **GitHub**    | Source code hosting            |
 
 ---
 
 # 🏗️ System Architecture
 
 ```text
-                   ┌──────────────────────┐
-                   │       User / Admin   │
-                   └──────────┬───────────┘
-                              │
-                              ▼
-                   ┌──────────────────────┐
-                   │    Flask Web App     │
-                   └──────────┬───────────┘
-                              │
-             ┌────────────────┼────────────────┐
-             │                │                │
-             ▼                ▼                ▼
-      Student Management  Face System     Attendance
-             │                │                │
-             │                ▼                │
-             │          OpenCV Camera          │
-             │                │                │
-             │                ▼                │
-             │        Face Detection           │
-             │                │                │
-             │                ▼                │
-             │        Face Recognition         │
-             │                │                │
-             └────────────────┼────────────────┘
-                              ▼
-                    ┌──────────────────┐
-                    │  SQLite Database │
-                    └──────────────────┘
+                         ┌───────────────────┐
+                         │    User / Admin   │
+                         └─────────┬─────────┘
+                                   │
+                                   ↓
+                         ┌───────────────────┐
+                         │    Flask Web App  │
+                         └─────────┬─────────┘
+                                   │
+             ┌─────────────────────┼─────────────────────┐
+             ↓                     ↓                     ↓
+   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+   │ Student         │   │ Face Recognition│   │ Attendance      │
+   │ Management      │   │ System          │   │ Management      │
+   └────────┬────────┘   └────────┬────────┘   └────────┬────────┘
+            │                     │                     │
+            │                     ↓                     │
+            │            ┌─────────────────┐            │
+            │            │ OpenCV Camera   │            │
+            │            └────────┬────────┘            │
+            │                     ↓                     │
+            │            ┌─────────────────┐            │
+            │            │ Face Detection  │            │
+            │            └────────┬────────┘            │
+            │                     ↓                     │
+            │            ┌─────────────────┐            │
+            │            │ Face Recognition│            │
+            │            └────────┬────────┘            │
+            │                     │                     │
+            └─────────────────────┼─────────────────────┘
+                                  ↓
+                         ┌───────────────────┐
+                         │  SQLite Database  │
+                         └───────────────────┘
 ```
 
 ---
@@ -168,7 +232,14 @@ Automated-Attendance-System/
 │   └── ...
 │
 ├── static/
+│   ├── style.css
 │   └── ...
+│
+├── screenshots/
+│   ├── dashboard.png.png
+│   ├── student-management.png.png
+│   ├── attendance.png.png
+│   └── attendance-report.png.png
 │
 ├── data/
 │   └── ...
@@ -184,8 +255,6 @@ Automated-Attendance-System/
 └── README.md
 ```
 
-> The exact files may change as the project is further developed.
-
 ---
 
 # 🚀 Installation
@@ -196,13 +265,13 @@ Automated-Attendance-System/
 git clone https://github.com/sriguganeswar333-pixel/Automated-Attendance-System.git
 ```
 
+## 2. Navigate to the Project
+
 ```bash
 cd Automated-Attendance-System
 ```
 
----
-
-## 2. Create a Virtual Environment
+## 3. Create a Virtual Environment
 
 ### Windows
 
@@ -210,15 +279,13 @@ cd Automated-Attendance-System
 python -m venv venv
 ```
 
-Activate it:
+Activate the environment:
 
 ```bash
 venv\Scripts\activate
 ```
 
----
-
-## 3. Install Dependencies
+## 4. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -226,7 +293,7 @@ pip install -r requirements.txt
 
 ---
 
-# ▶️ Running the Application
+# ▶️ Run the Application
 
 Start the Flask application:
 
@@ -234,17 +301,17 @@ Start the Flask application:
 python app.py
 ```
 
-Then open the local Flask address shown in the terminal, typically:
+The application will normally be available at:
 
 ```text
 http://127.0.0.1:5000
 ```
 
+Open the address in your web browser.
+
 ---
 
 # 📷 Face Registration Workflow
-
-The face registration process follows these steps:
 
 ```text
 Select Student
@@ -257,119 +324,101 @@ Store Training Images
       ↓
 Train Face Recognition Model
       ↓
-Save Trained Model
+Save Model
 ```
 
-The trained face model is then used during live recognition.
+The trained model is then used for live student recognition.
 
 ---
 
 # 🧠 Face Recognition Workflow
 
-During live recognition:
-
 ```text
 Camera
-  ↓
+   ↓
 Capture Frame
-  ↓
+   ↓
 Detect Face
-  ↓
-Extract Facial Information
-  ↓
+   ↓
+Process Face
+   ↓
 Compare With Trained Model
-  ↓
-Identify Student
-  ↓
-Display Student ID
-  ↓
-Record Attendance
+   ↓
+Recognize Student
+   ↓
+Identify Student ID
+   ↓
+Display Recognition Result
 ```
 
 ---
 
-# 📊 Attendance Workflow
+# 📝 Attendance Workflow
 
 ```text
-Student Appears Before Camera
-              ↓
-        Face Detected
-              ↓
-       Face Recognized
-              ↓
-       Student Identified
-              ↓
-       Check Attendance
-              ↓
-      Record Date & Time
+Student Appears
+       ↓
+Face Detected
+       ↓
+Face Recognized
+       ↓
+Student Identified
+       ↓
+Check Existing Attendance
+       ↓
+Record Date & Time
+       ↓
+Attendance Saved
 ```
-
-This allows attendance to be recorded without manually entering the student's details.
 
 ---
 
-# 🔐 Privacy & Biometric Data
+# 🔐 Privacy & Security
 
-This project involves facial recognition and therefore requires responsible handling of biometric-related data.
+Because the project uses facial recognition, biometric-related information must be handled responsibly.
 
-For development and demonstration purposes:
+The following data should remain local and should not be publicly uploaded:
 
-* Student facial images should not be uploaded to the public repository.
-* Trained face-recognition model files should not be committed to GitHub.
-* Attendance database files should remain local.
-* Personal student information should be handled securely.
-* Access to facial data should be restricted to authorized users.
+* Student facial images
+* Trained face-recognition models
+* Attendance database
+* Personal student information
+* Environment/configuration files containing secrets
 
-The repository intentionally excludes sensitive/generated files through `.gitignore`.
+The project uses `.gitignore` to prevent sensitive and generated files from being committed to the public repository.
 
-### 🚫 Files intentionally excluded
+### 🚫 Example excluded files
 
 ```text
 attendance.db
-venv/
-face_model.yml
-student face images
-other generated biometric data
-```
-
----
-
-# 🛡️ GitHub Security
-
-The project uses `.gitignore` to prevent unnecessary or sensitive local files from being uploaded.
-
-Example:
-
-```text
 venv/
 __pycache__/
 *.pyc
-attendance.db
-data/faces/
 *.yml
 .env
+data/faces/
 ```
 
-> Make sure your actual `.gitignore` matches the files you want to keep private.
+> Always verify the actual `.gitignore` before pushing the project to a public repository.
 
 ---
 
-# 🔮 Future Enhancements
+# 📈 Future Enhancements
 
-Planned improvements include:
+The project can be further improved with:
 
-* 📊 Advanced attendance reports
-* 📅 Daily/monthly attendance filtering
-* 📈 Attendance percentage calculation
-* 📥 Export attendance to CSV/Excel
-* 👨‍🏫 Teacher/admin authentication
-* 🔔 Attendance notifications
+* 📅 Daily, weekly, and monthly attendance filtering
+* 📊 Attendance percentage calculation
+* 📥 CSV/Excel attendance export
+* 👨‍🏫 Teacher and administrator authentication
+* 🔔 Automated attendance notifications
 * ☁️ Cloud database integration
-* 📱 Mobile-friendly interface
-* 🤖 Improved face recognition accuracy
-* 🧑‍🎓 Student profile management
-* 📷 Better camera and lighting handling
-* 🔐 Enhanced biometric-data security
+* 📱 Responsive/mobile-friendly interface
+* 🤖 Improved recognition accuracy
+* 🧑‍🎓 Detailed student profiles
+* 📷 Improved camera and lighting handling
+* 🔐 Enhanced biometric-data protection
+* 📈 Advanced attendance analytics
 
 ---
 
@@ -380,31 +429,30 @@ This project demonstrates the practical integration of:
 * Artificial Intelligence
 * Computer Vision
 * Face Recognition
-* Python Programming
+* Python
+* Flask
+* SQLite
 * Web Development
 * Database Management
-* Software Engineering
 * Git & GitHub
 
-It is developed as an academic/project implementation to demonstrate how AI and computer vision can be applied to automate real-world administrative tasks.
+The project is intended as an academic and portfolio project demonstrating how AI and computer vision can be applied to automate real-world educational tasks.
 
 ---
 
 # 👨‍💻 Author
 
-**SRIGUGANESWAR.C**
+## SRIGUGANESWAR.C
 
-B.Tech – Artificial Intelligence & Data Science
+**B.Tech – Artificial Intelligence & Data Science**
 
-Panimalar Engineering College
+**Panimalar Engineering College**
 
 ---
 
 # ⭐ Project
 
-**Automated Attendance System**
-
-Built using:
+### Automated Attendance System
 
 ```text
 Python + Flask + OpenCV + SQLite
@@ -414,6 +462,13 @@ If you find this project useful, consider giving the repository a ⭐ on GitHub.
 
 ---
 
-## 📜 License
+# 📜 License
 
-This project is intended primarily for educational and academic purposes.
+This project is developed for **educational and academic purposes**.
+
+---
+
+## 🔗 Repository
+
+**GitHub:**
+https://github.com/sriguganeswar333-pixel/Automated-Attendance-System
