@@ -1,28 +1,75 @@
-# Virtual environment
+# ================================
+
+# Virtual Environment
+
+# ================================
+
 venv/
 .venv/
 
-# Python cache
-__pycache__/
+# ================================
+
+# Python Cache / Compiled Files
+
+# ================================
+
+**pycache**/
 *.py[cod]
 *.class
 
-# Database
+# ================================
+
+# Database Files
+
+# ================================
+
 attendance.db
 *.db
+*.sqlite
+*.sqlite3
 
-# Face biometric data
+# ================================
+
+# Face / Biometric Data
+
+# ================================
+
 data/faces/
 data/face_model.yml
+face_model.yml
+*.yml
 
-# Environment variables
+# ================================
+
+# Environment Variables / Secrets
+
+# ================================
+
 .env
 .env.*
 
-# IDE
+# ================================
+
+# IDE / Editor Files
+
+# ================================
+
 .vscode/
 .idea/
 
-# OS files
+# ================================
+
+# Operating System Files
+
+# ================================
+
 .DS_Store
 Thumbs.db
+
+# ================================
+
+# Generated Logs
+
+# ================================
+
+*.log
