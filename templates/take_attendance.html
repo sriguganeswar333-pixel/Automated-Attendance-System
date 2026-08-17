@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Take Attendance</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            color: #d1d5db;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 35px auto;
+        }
+
+        .camera-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.10);
+            text-align: center;
+        }
+
+        .camera-box {
+            width: 100%;
+            max-width: 700px;
+            height: 430px;
+            margin: 0 auto 25px;
+            background: #111827;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            background: #f3f4f6;
+            margin: 20px auto;
+            max-width: 700px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #15803d;
+            background: #dcfce7;
+        }
+
+        .error {
+            color: #b91c1c;
+            background: #fee2e2;
+        }
+
+        .info {
+            color: #1d4ed8;
+            background: #dbeafe;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        button,
+        .back-btn {
+            border: none;
+            padding: 12px 22px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .start-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .start-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .stop-btn {
+            background: #dc2626;
+            color: white;
+        }
+
+        .stop-btn:hover {
+            background: #b91c1c;
+        }
+
+        .back-btn {
+            background: #6b7280;
+            color: white;
+        }
+
+        .back-btn:hover {
+            background: #4b5563;
+        }
+
+        .attendance-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .info-card {
+            background: #f8fafc;
+            padding: 20px 30px;
+            border-radius: 10px;
+            min-width: 180px;
+        }
+
+        .info-card h2 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .info-card p {
+            margin: 8px 0 0;
+            color: #666;
+        }
+
+        @media (max-width: 700px) {
+
+            .container {
+                width: 95%;
+            }
+
+            .camera-card {
+                padding: 20px;
+            }
+
+            .camera-box {
+                height: 300px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <h1>
+        🤖 Automated Attendance
+    </h1>
+
+    <p>
+        AI Face Recognition Attendance System
+    </p>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="container">
+
+    <div class="camera-card">
+
+
+        <h2>
+            📷 Live Attendance Camera
+        </h2>
+
+
+        <p>
+            Look directly at the camera.
+            The AI will recognize the registered student.
+        </p>
+
+
+        <!-- CAMERA -->
+
+        <div class="camera-box">
+
+            <video
+                id="camera"
+                autoplay
+                playsinline>
+            </video>
+
+        </div>
+
+
+        <!-- STATUS -->
+
+        <div
+            id="status"
+            class="status info">
+
+            🔵 Camera is ready.
+            Click <strong>Start Camera</strong>.
+
+        </div>
+
+
+        <!-- BUTTONS -->
+
+        <div class="buttons">
+
+            <button
+                id="startBtn"
+                class="start-btn"
+                onclick="startCamera()">
+
+                📷 Start Camera
+
+            </button>
+
+
+            <button
+                id="stopBtn"
+                class="stop-btn"
+                onclick="stopCamera()"
+                disabled>
+
+                ⛔ Stop Camera
+
+            </button>
+
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="back-btn">
+
+                ← Dashboard
+
+            </a>
+
+        </div>
+
+
+        <!-- ATTENDANCE INFORMATION -->
+
+        <div class="attendance-info">
+
+
+            <div class="info-card">
+
+                <h2 id="presentCount">
+                    {{ present_today }}
+                </h2>
+
+                <p>
+                    Present Today
+                </p>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <h2 id="totalCount">
+                    {{ total_students }}
+                </h2>
+
+                <p>
+                    Total Students
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script>
+
+    let stream = null;
+
+
+    // ==================================================
+    // START CAMERA
+    // ==================================================
+
+    async function startCamera() {
+
+        const video =
+            document.getElementById("camera");
+
+        const status =
+            document.getElementById("status");
+
+        const startBtn =
+            document.getElementById("startBtn");
+
+        const stopBtn =
+            document.getElementById("stopBtn");
+
+
+        try {
+
+            stream =
+                await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+
+
+            video.srcObject = stream;
+
+
+            status.className =
+                "status success";
+
+            status.innerHTML =
+                "🟢 Camera started. " +
+                "Look at the camera.";
+
+
+            startBtn.disabled = true;
+
+            stopBtn.disabled = false;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+
+            status.className =
+                "status error";
+
+            status.innerHTML =
+                "❌ Camera access failed. " +
+                "Please allow camera permission.";
+
+        }
+
+    }
+
+
+    // ==================================================
+    // STOP CAMERA
+    // ==================================================
+
+    function stopCamera() {
+
+        const video =
+            document.getElementById("camera");
+
+        const status =
+            document.getElementById("status");
+
+        const startBtn =
+            document.getElementById("startBtn");
+
+        const stopBtn =
+            document.getElementById("stopBtn");
+
+
+        if (stream) {
+
+            stream
+                .getTracks()
+                .forEach(track => track.stop());
+
+            stream = null;
+
+        }
+
+
+        video.srcObject = null;
+
+
+        status.className =
+            "status info";
+
+        status.innerHTML =
+            "🔵 Camera stopped.";
+
+
+        startBtn.disabled = false;
+
+        stopBtn.disabled = true;
+
+    }
+
+
+    // ==================================================
+    // STOP CAMERA WHEN PAGE CLOSES
+    // ==================================================
+
+    window.addEventListener(
+        "beforeunload",
+        function () {
+
+            if (stream) {
+
+                stream
+                    .getTracks()
+                    .forEach(track => track.stop());
+
+            }
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>

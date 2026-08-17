@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Attendance Reports</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f4f7fb;
+
+            color: #111827;
+        }
+
+
+        .container {
+
+            width: 95%;
+
+            max-width: 1450px;
+
+            margin: 20px auto 50px;
+        }
+
+
+        /* ==================================================
+           BACK BUTTON
+        ================================================== */
+
+        .back-button {
+
+            display: inline-block;
+
+            padding: 10px 18px;
+
+            background: #1f2937;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 12px;
+        }
+
+
+        .back-button:hover {
+
+            background: #374151;
+        }
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+        .page-header {
+
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.06);
+
+            margin-bottom: 18px;
+        }
+
+
+        .page-header h1 {
+
+            margin: 0 0 7px;
+
+            font-size: 28px;
+        }
+
+
+        .page-header p {
+
+            margin: 0;
+
+            color: #6b7280;
+
+            font-size: 14px;
+        }
+
+
+        /* ==================================================
+           FILTER BOX
+        ================================================== */
+
+        .filter-box {
+
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.06);
+
+            margin-bottom: 18px;
+        }
+
+
+        .filter-box h2 {
+
+            margin: 0 0 18px;
+
+            font-size: 18px;
+        }
+
+
+        .filters {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 14px;
+        }
+
+
+        .filter-group {
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .filter-group label {
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            margin-bottom: 6px;
+
+            color: #374151;
+        }
+
+
+        .filter-group input,
+        .filter-group select {
+
+            height: 38px;
+
+            padding: 8px 10px;
+
+            border:
+                1px solid #cbd5e1;
+
+            border-radius: 6px;
+
+            background: white;
+
+            font-size: 13px;
+        }
+
+
+        .filter-actions {
+
+            margin-top: 14px;
+
+            display: flex;
+
+            gap: 8px;
+        }
+
+
+        .filter-button {
+
+            border: none;
+
+            background: #2563eb;
+
+            color: white;
+
+            padding: 10px 18px;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .clear-button {
+
+            background: #6b7280;
+
+            color: white;
+
+            text-decoration: none;
+
+            padding: 10px 18px;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+        }
+
+
+        /* ==================================================
+           SUMMARY CARDS
+        ================================================== */
+
+        .summary-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 14px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .summary-card {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.06);
+
+            border-left: 4px solid #2563eb;
+        }
+
+
+        .summary-card.present {
+
+            border-left-color:
+                #16a34a;
+        }
+
+
+        .summary-card.absent {
+
+            border-left-color:
+                #ef4444;
+        }
+
+
+        .summary-card.rate {
+
+            border-left-color:
+                #7c3aed;
+        }
+
+
+        .summary-value {
+
+            font-size: 26px;
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+        }
+
+
+        .summary-title {
+
+            color: #6b7280;
+
+            font-size: 12px;
+        }
+
+
+        /* ==================================================
+           DAILY STATUS HEADER
+        ================================================== */
+
+        .daily-header {
+
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.06);
+
+            margin-bottom: 18px;
+        }
+
+
+        .daily-header h2 {
+
+            margin: 0 0 7px;
+
+            font-size: 19px;
+        }
+
+
+        .daily-header p {
+
+            margin: 0;
+
+            color: #6b7280;
+
+            font-size: 13px;
+        }
+
+
+        /* ==================================================
+           PRESENT + ABSENT
+        ================================================== */
+
+        .attendance-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 18px;
+
+            margin-bottom: 22px;
+        }
+
+
+        .table-box {
+
+            background: white;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.06);
+
+            overflow: hidden;
+        }
+
+
+        .table-header {
+
+            padding: 16px 18px;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+        }
+
+
+        .present-header {
+
+            background: #ecfdf5;
+
+            border-bottom:
+                2px solid #22c55e;
+        }
+
+
+        .absent-header {
+
+            background: #fef2f2;
+
+            border-bottom:
+                2px solid #ef4444;
+        }
+
+
+        .table-header h2 {
+
+            margin: 0;
+
+            font-size: 16px;
+        }
+
+
+        .present-header h2 {
+
+            color: #047857;
+        }
+
+
+        .absent-header h2 {
+
+            color: #b91c1c;
+        }
+
+
+        .count-badge {
+
+            min-width: 28px;
+
+            height: 28px;
+
+            padding: 0 8px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            color: white;
+
+            font-weight: bold;
+
+            font-size: 12px;
+        }
+
+
+        .present-badge {
+
+            background: #22c55e;
+        }
+
+
+        .absent-badge {
+
+            background: #ef4444;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+        }
+
+
+        th {
+
+            background: #f8fafc;
+
+            color: #374151;
+
+            font-size: 11px;
+
+            padding: 11px 10px;
+
+            text-align: left;
+
+            border-bottom:
+                1px solid #e5e7eb;
+        }
+
+
+        td {
+
+            padding: 12px 10px;
+
+            font-size: 12px;
+
+            border-bottom:
+                1px solid #eef2f7;
+        }
+
+
+        tbody tr:hover {
+
+            background: #f8fafc;
+        }
+
+
+        .present-status {
+
+            color: #15803d;
+
+            font-weight: bold;
+        }
+
+
+        .absent-status {
+
+            color: #dc2626;
+
+            font-weight: bold;
+        }
+
+
+        .empty {
+
+            text-align: center;
+
+            padding: 28px;
+
+            color: #9ca3af;
+
+            font-size: 13px;
+        }
+
+
+        /* ==================================================
+           ATTENDANCE HISTORY
+        ================================================== */
+
+        .records-box {
+
+            background: white;
+
+            padding: 18px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.06);
+
+            overflow-x: auto;
+        }
+
+
+        .records-header {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            margin-bottom: 14px;
+        }
+
+
+        .records-header h2 {
+
+            margin: 0;
+
+            font-size: 18px;
+        }
+
+
+        .record-count {
+
+            background: #eff6ff;
+
+            color: #2563eb;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+        }
+
+
+        .history-table th {
+
+            background: #1f2937;
+
+            color: white;
+        }
+
+
+        /* ==================================================
+           RESPONSIVE
+        ================================================== */
+
+        @media (max-width: 1000px) {
+
+            .filters {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .summary-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+        }
+
+
+        @media (max-width: 700px) {
+
+            .attendance-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .filters {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .summary-grid {
+
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- ==================================================
+         BACK
+    ================================================== -->
+
+    <a
+        href="{{ url_for('dashboard') }}"
+        class="back-button"
+    >
+        ← Back to Dashboard
+    </a>
+
+
+    <!-- ==================================================
+         PAGE HEADER
+    ================================================== -->
+
+    <div class="page-header">
+
+        <h1>
+            📊 Attendance Reports
+        </h1>
+
+        <p>
+            View and analyze student attendance
+            records and daily attendance status.
+        </p>
+
+    </div>
+
+
+    <!-- ==================================================
+         FILTERS
+    ================================================== -->
+
+    <div class="filter-box">
+
+        <h2>
+            🔎 Attendance Filters
+        </h2>
+
+
+        <form
+            method="GET"
+            action="{{ url_for('attendance_reports') }}"
+        >
+
+            <div class="filters">
+
+
+                <!-- DATE -->
+
+                <div class="filter-group">
+
+                    <label>
+                        Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="date"
+                        value="{{ selected_date }}"
+                    >
+
+                </div>
+
+
+                <!-- STUDENT -->
+
+                <div class="filter-group">
+
+                    <label>
+                        Student
+                    </label>
+
+                    <select name="student">
+
+                        <option value="">
+                            All Students
+                        </option>
+
+
+                        {% for student in students_list %}
+
+                        <option
+                            value="{{ student['student_id'] }}"
+                            {% if selected_student == student['student_id']|string %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ student['name'] }}
+                            — ID {{ student['student_id'] }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- CLASS -->
+
+                <div class="filter-group">
+
+                    <label>
+                        Class
+                    </label>
+
+                    <input
+                        type="text"
+                        name="class_name"
+                        value="{{ selected_class }}"
+                        placeholder="Example: 10"
+                    >
+
+                </div>
+
+
+                <!-- SECTION -->
+
+                <div class="filter-group">
+
+                    <label>
+                        Section
+                    </label>
+
+                    <input
+                        type="text"
+                        name="section"
+                        value="{{ selected_section }}"
+                        placeholder="Example: A"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="filter-actions">
+
+                <button
+                    type="submit"
+                    class="filter-button"
+                >
+                    🔎 Apply Filter
+                </button>
+
+
+                <a
+                    href="{{ url_for('attendance_reports') }}"
+                    class="clear-button"
+                >
+                    Clear
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ==================================================
+         SUMMARY
+    ================================================== -->
+
+    <div class="summary-grid">
+
+
+        <div class="summary-card">
+
+            <div class="summary-value">
+                {{ total_students }}
+            </div>
+
+            <div class="summary-title">
+                Total Students
+            </div>
+
+        </div>
+
+
+        <div class="summary-card present">
+
+            <div class="summary-value">
+                {{ today_present }}
+            </div>
+
+            <div class="summary-title">
+                Present Students
+            </div>
+
+        </div>
+
+
+        <div class="summary-card absent">
+
+            <div class="summary-value">
+                {{ today_absent }}
+            </div>
+
+            <div class="summary-title">
+                Absent Students
+            </div>
+
+        </div>
+
+
+        <div class="summary-card rate">
+
+            <div class="summary-value">
+                {{ attendance_rate }}%
+            </div>
+
+            <div class="summary-title">
+                Attendance Rate
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         DAILY STATUS
+    ================================================== -->
+
+    <div class="daily-header">
+
+        <h2>
+            📋 Daily Attendance Status
+        </h2>
+
+        <p>
+            Attendance status for
+            <strong>{{ report_date }}</strong>
+        </p>
+
+    </div>
+
+
+    <!-- ==================================================
+         PRESENT + ABSENT TABLES
+    ================================================== -->
+
+    <div class="attendance-grid">
+
+
+        <!-- ==================================================
+             PRESENT STUDENTS
+        ================================================== -->
+
+        <div class="table-box">
+
+
+            <div class="table-header present-header">
+
+                <h2>
+                    ✅ Present Students
+                </h2>
+
+                <div class="count-badge present-badge">
+
+                    {{ today_present }}
+
+                </div>
+
+            </div>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Class
+                        </th>
+
+                        <th>
+                            Section
+                        </th>
+
+                        <th>
+                            Time
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                {# ==================================================
+                   IMPORTANT FIX:
+                   namespace() allows the variable to survive
+                   inside the Jinja loop.
+                ================================================== #}
+
+
+                {% set ns = namespace(
+                    present_found=false,
+                    present_count=0
+                ) %}
+
+
+                {% for record in attendance_records %}
+
+
+                    {% if record["date"] == report_date
+                          and record["status"] == "Present" %}
+
+
+                        {% set ns.present_found = true %}
+
+                        {% set ns.present_count =
+                            ns.present_count + 1
+                        %}
+
+
+                        <tr>
+
+                            <td>
+                                {{ record["student_id"] }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ record["name"] }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ record["class_name"] }}
+                            </td>
+
+                            <td>
+                                {{ record["section"] }}
+                            </td>
+
+                            <td>
+                                {{ record["time"] }}
+                            </td>
+
+                            <td class="present-status">
+                                ✓ Present
+                            </td>
+
+                        </tr>
+
+
+                    {% endif %}
+
+
+                {% endfor %}
+
+
+                {% if not ns.present_found %}
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="empty"
+                        >
+
+                            No students present.
+
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+
+                </tbody>
+
+            </table>
+
+
+        </div>
+
+
+        <!-- ==================================================
+             ABSENT STUDENTS
+        ================================================== -->
+
+        <div class="table-box">
+
+
+            <div class="table-header absent-header">
+
+                <h2>
+                    ❌ Absent Students
+                </h2>
+
+                <div class="count-badge absent-badge">
+
+                    {{ today_absent }}
+
+                </div>
+
+            </div>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Class
+                        </th>
+
+                        <th>
+                            Section
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                {% if absent_students %}
+
+
+                    {% for student in absent_students %}
+
+
+                    <tr>
+
+                        <td>
+                            {{ student["student_id"] }}
+                        </td>
+
+                        <td>
+
+                            <strong>
+                                {{ student["name"] }}
+                            </strong>
+
+                        </td>
+
+                        <td>
+                            {{ student["class_name"] }}
+                        </td>
+
+                        <td>
+                            {{ student["section"] }}
+                        </td>
+
+                        <td class="absent-status">
+                            ✕ Absent
+                        </td>
+
+                    </tr>
+
+
+                    {% endfor %}
+
+
+                {% else %}
+
+
+                    <tr>
+
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+
+                            🎉 Everyone is present!
+
+                        </td>
+
+                    </tr>
+
+
+                {% endif %}
+
+
+                </tbody>
+
+            </table>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         ATTENDANCE HISTORY
+    ================================================== -->
+
+    <div class="records-box">
+
+
+        <div class="records-header">
+
+            <h2>
+                📝 Attendance Records
+            </h2>
+
+
+            <div class="record-count">
+
+                {{ attendance_records|length }}
+                Records
+
+            </div>
+
+        </div>
+
+
+        <table class="history-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Student
+                    </th>
+
+                    <th>
+                        Class
+                    </th>
+
+                    <th>
+                        Section
+                    </th>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Time
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% if attendance_records %}
+
+
+                {% for record in attendance_records %}
+
+
+                <tr>
+
+                    <td>
+                        {{ record["student_id"] }}
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ record["name"] }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ record["class_name"] }}
+                    </td>
+
+                    <td>
+                        {{ record["section"] }}
+                    </td>
+
+                    <td>
+                        {{ record["date"] }}
+                    </td>
+
+                    <td>
+                        {{ record["time"] }}
+                    </td>
+
+                    <td>
+
+
+                        {% if record["status"] == "Present" %}
+
+                            <span class="present-status">
+                                ✓ Present
+                            </span>
+
+                        {% else %}
+
+                            <span class="absent-status">
+                                ✕ Absent
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+                </tr>
+
+
+                {% endfor %}
+
+
+            {% else %}
+
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        class="empty"
+                    >
+
+                        📭 No attendance records found.
+
+                    </td>
+
+                </tr>
+
+
+            {% endif %}
+
+
+            </tbody>
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

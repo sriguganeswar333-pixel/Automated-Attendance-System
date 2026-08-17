@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Take Attendance</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 35px auto;
+            text-align: center;
+        }
+
+        h1 {
+            color: #1f2937;
+        }
+
+        .camera-box {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: 25px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 700px;
+            border-radius: 12px;
+            background: #111;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        button {
+            border: none;
+            padding: 13px 22px;
+            margin: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .start {
+            background: #2563eb;
+            color: white;
+        }
+
+        .capture {
+            background: #16a34a;
+            color: white;
+        }
+
+        .stop {
+            background: #dc2626;
+            color: white;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            background: #374151;
+            color: white;
+            padding: 11px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        #message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            min-height: 20px;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+    <h1>
+        📷 Automated Face Attendance
+    </h1>
+
+    <p>
+        Position your face clearly inside the camera.
+    </p>
+
+
+    <div class="camera-box">
+
+        <video
+            id="video"
+            autoplay
+            playsinline>
+        </video>
+
+        <canvas id="canvas"></canvas>
+
+
+        <div>
+
+            <button
+                class="start"
+                onclick="startCamera()">
+
+                📷 Start Camera
+
+            </button>
+
+
+            <button
+                class="capture"
+                onclick="captureFace()">
+
+                🔍 Recognize Face
+
+            </button>
+
+
+            <button
+                class="stop"
+                onclick="stopCamera()">
+
+                ⛔ Stop Camera
+
+            </button>
+
+        </div>
+
+
+        <div id="message"></div>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('dashboard') }}"
+        class="back">
+
+        ← Back to Dashboard
+
+    </a>
+
+</div>
+
+
+<script>
+
+let stream = null;
+
+const video =
+    document.getElementById("video");
+
+const canvas =
+    document.getElementById("canvas");
+
+const message =
+    document.getElementById("message");
+
+
+// ==================================================
+// START CAMERA
+// ==================================================
+
+async function startCamera() {
+
+    try {
+
+        stream =
+            await navigator.mediaDevices
+                .getUserMedia({
+                    video: true,
+                    audio: false
+                });
+
+        video.srcObject = stream;
+
+        showMessage(
+            "📷 Camera started. Look at the camera.",
+            "info"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        showMessage(
+            "❌ Camera permission denied or camera unavailable.",
+            "error"
+        );
+
+    }
+
+}
+
+
+// ==================================================
+// STOP CAMERA
+// ==================================================
+
+function stopCamera() {
+
+    if (stream) {
+
+        stream
+            .getTracks()
+            .forEach(
+                track => track.stop()
+            );
+
+        video.srcObject = null;
+
+        stream = null;
+
+    }
+
+    showMessage(
+        "⛔ Camera stopped.",
+        "info"
+    );
+
+}
+
+
+// ==================================================
+// CAPTURE FACE
+// ==================================================
+
+async function captureFace() {
+
+    if (!stream) {
+
+        showMessage(
+            "❌ Please start the camera first.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    // Set canvas size
+
+    canvas.width =
+        video.videoWidth;
+
+    canvas.height =
+        video.videoHeight;
+
+
+    // Capture current frame
+
+    const context =
+        canvas.getContext("2d");
+
+    context.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    showMessage(
+        "🔍 Recognizing face...",
+        "info"
+    );
+
+
+    // Convert image
+
+    canvas.toBlob(
+        async function(blob) {
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "image",
+                blob,
+                "attendance.jpg"
+            );
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        "{{ url_for('browser_recognize_face') }}",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                console.log(result);
+
+
+                // ----------------------------------
+                // SUCCESS
+                // ----------------------------------
+
+                if (result.success) {
+
+                    showMessage(
+                        result.message,
+                        "success"
+                    );
+
+
+                    // Stop camera automatically
+
+                    stopCamera();
+
+
+                    // Wait and return dashboard
+
+                    setTimeout(
+                        function() {
+
+                            window.location.href =
+                                "{{ url_for('attendance_reports') }}";
+
+                        },
+                        2000
+                    );
+
+                }
+
+                else {
+
+                    showMessage(
+                        result.message,
+                        "error"
+                    );
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(error);
+
+                showMessage(
+                    "❌ Server error while recognizing face.",
+                    "error"
+                );
+
+            }
+
+        },
+        "image/jpeg",
+        0.9
+    );
+
+}
+
+
+// ==================================================
+// MESSAGE
+// ==================================================
+
+function showMessage(
+    text,
+    type
+) {
+
+    message.innerText = text;
+
+    message.className = type;
+
+}
+
+</script>
+
+
+</body>
+
+</html>

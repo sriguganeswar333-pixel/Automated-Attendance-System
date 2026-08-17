@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Attendance System</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f8fafc
+                );
+        }
+
+
+        .box {
+
+            width: 90%;
+
+            max-width: 600px;
+
+            background: white;
+
+            padding: 45px;
+
+            border-radius: 20px;
+
+            text-align: center;
+
+            box-shadow:
+                0 10px 35px
+                rgba(0,0,0,0.1);
+        }
+
+
+        h1 {
+
+            margin-bottom: 15px;
+
+            color: #1f2937;
+        }
+
+
+        .message {
+
+            font-size: 20px;
+
+            margin: 25px 0;
+
+            font-weight: bold;
+        }
+
+
+        .time {
+
+            background: #f3f4f6;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            margin: 20px 0;
+
+            color: #374151;
+        }
+
+
+        .back {
+
+            display: inline-block;
+
+            margin-top: 20px;
+
+            padding: 12px 25px;
+
+            background: #2563eb;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+            font-weight: bold;
+        }
+
+
+        .back:hover {
+
+            background: #1d4ed8;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="box">
+
+    {% if attendance_open %}
+
+        <h1>
+            📷 Attendance Started
+        </h1>
+
+        <div class="message">
+            🟢 {{ status_message }}
+        </div>
+
+        <p>
+            The attendance camera has been launched.
+        </p>
+
+    {% else %}
+
+        <h1>
+            🔴 Attendance Closed
+        </h1>
+
+        <div class="message">
+            {{ status_message }}
+        </div>
+
+        <p>
+            The attendance system is available only
+            during the scheduled attendance hours.
+        </p>
+
+    {% endif %}
+
+
+    <div class="time">
+
+        🕣 Attendance Time
+
+        <br><br>
+
+        <strong>
+            {{ start_time }}
+            &nbsp; → &nbsp;
+            {{ end_time }}
+        </strong>
+
+    </div>
+
+
+    <a href="/" class="back">
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+</body>
+
+</html>
