@@ -13,11 +13,22 @@
 
     <title>Attendance System</title>
 
+
     <style>
+
+        /* ==================================================
+           GLOBAL
+        ================================================== */
 
         * {
             box-sizing: border-box;
         }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
 
         body {
 
@@ -31,156 +42,902 @@
 
             align-items: center;
 
-            font-family: Arial, sans-serif;
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            transition:
+                background 0.35s ease,
+                color 0.35s ease;
 
             background:
                 linear-gradient(
                     135deg,
                     #eef2ff,
-                    #f8fafc
+                    #f8fafc,
+                    #e0f2fe
                 );
+
+            color:
+                #1f2937;
         }
 
+
+        /* ==================================================
+           LIGHT THEME VARIABLES
+        ================================================== */
+
+        :root {
+
+            --background-main:
+                linear-gradient(
+                    135deg,
+                    #eef2ff,
+                    #f8fafc,
+                    #e0f2fe
+                );
+
+            --card-background:
+                rgba(255, 255, 255, 0.97);
+
+            --text-main:
+                #1f2937;
+
+            --text-secondary:
+                #6b7280;
+
+            --border:
+                #e5e7eb;
+
+            --time-background:
+                #f3f4f6;
+
+            --time-text:
+                #374151;
+
+            --button-background:
+                #2563eb;
+
+            --button-hover:
+                #1d4ed8;
+
+            --shadow:
+                rgba(0, 0, 0, 0.10);
+
+            --theme-background:
+                rgba(255, 255, 255, 0.92);
+
+            --theme-text:
+                #1f2937;
+        }
+
+
+        /* ==================================================
+           DARK THEME
+        ================================================== */
+
+        body.dark-theme {
+
+            --background-main:
+                linear-gradient(
+                    135deg,
+                    #0f172a,
+                    #111827,
+                    #1e293b
+                );
+
+            --card-background:
+                rgba(17, 24, 39, 0.97);
+
+            --text-main:
+                #f9fafb;
+
+            --text-secondary:
+                #cbd5e1;
+
+            --border:
+                #334155;
+
+            --time-background:
+                #1e293b;
+
+            --time-text:
+                #e2e8f0;
+
+            --button-background:
+                #3b82f6;
+
+            --button-hover:
+                #2563eb;
+
+            --shadow:
+                rgba(0, 0, 0, 0.40);
+
+            --theme-background:
+                rgba(30, 41, 59, 0.95);
+
+            --theme-text:
+                #f8fafc;
+        }
+
+
+        /* ==================================================
+           APPLY THEME
+        ================================================== */
+
+        body {
+
+            background:
+                var(--background-main);
+
+            color:
+                var(--text-main);
+        }
+
+
+        /* ==================================================
+           THEME BUTTON
+        ================================================== */
+
+        .theme-toggle {
+
+            position:
+                fixed;
+
+            top:
+                22px;
+
+            left:
+                22px;
+
+            z-index:
+                9999;
+
+            width:
+                48px;
+
+            height:
+                48px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                14px;
+
+            background:
+                var(--theme-background);
+
+            color:
+                var(--theme-text);
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            cursor:
+                pointer;
+
+            font-size:
+                21px;
+
+            box-shadow:
+                0 8px 25px
+                var(--shadow);
+
+            backdrop-filter:
+                blur(12px);
+
+            transition:
+                all 0.25s ease;
+        }
+
+
+        .theme-toggle:hover {
+
+            transform:
+                translateY(-2px)
+                scale(1.04);
+
+            box-shadow:
+                0 12px 30px
+                var(--shadow);
+        }
+
+
+        .theme-toggle:active {
+
+            transform:
+                scale(0.96);
+        }
+
+
+        /* ==================================================
+           MAIN CARD
+        ================================================== */
 
         .box {
 
-            width: 90%;
+            width:
+                90%;
 
-            max-width: 600px;
+            max-width:
+                650px;
 
-            background: white;
+            background:
+                var(--card-background);
 
-            padding: 45px;
+            padding:
+                45px;
 
-            border-radius: 20px;
+            border:
+                1px solid var(--border);
 
-            text-align: center;
+            border-radius:
+                22px;
+
+            text-align:
+                center;
 
             box-shadow:
-                0 10px 35px
-                rgba(0,0,0,0.1);
+                0 15px 45px
+                var(--shadow);
+
+            backdrop-filter:
+                blur(10px);
+
+            transition:
+                background 0.35s ease,
+                border 0.35s ease,
+                box-shadow 0.35s ease;
+
+            animation:
+                cardAppear
+                0.45s
+                ease;
         }
 
+
+        @keyframes cardAppear {
+
+            from {
+
+                opacity:
+                    0;
+
+                transform:
+                    translateY(12px);
+
+            }
+
+            to {
+
+                opacity:
+                    1;
+
+                transform:
+                    translateY(0);
+
+            }
+
+        }
+
+
+        /* ==================================================
+           TITLE
+        ================================================== */
 
         h1 {
 
-            margin-bottom: 15px;
+            margin:
+                0 0 15px;
 
-            color: #1f2937;
+            color:
+                var(--text-main);
+
+            font-size:
+                30px;
+
+            transition:
+                color 0.3s ease;
         }
 
+
+        .subtitle {
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                15px;
+
+            margin-bottom:
+                5px;
+        }
+
+
+        /* ==================================================
+           STATUS MESSAGE
+        ================================================== */
 
         .message {
 
-            font-size: 20px;
+            font-size:
+                20px;
 
-            margin: 25px 0;
+            margin:
+                25px 0;
 
-            font-weight: bold;
+            font-weight:
+                700;
+
+            color:
+                var(--text-main);
         }
 
+
+        /* ==================================================
+           TIME BOX
+        ================================================== */
 
         .time {
 
-            background: #f3f4f6;
+            background:
+                var(--time-background);
 
-            padding: 15px;
+            padding:
+                18px;
 
-            border-radius: 10px;
+            border:
+                1px solid var(--border);
 
-            margin: 20px 0;
+            border-radius:
+                12px;
 
-            color: #374151;
+            margin:
+                20px 0;
+
+            color:
+                var(--time-text);
+
+            transition:
+                all 0.3s ease;
         }
 
 
+        .time strong {
+
+            font-size:
+                18px;
+
+            color:
+                var(--text-main);
+        }
+
+
+        /* ==================================================
+           STATUS INDICATOR
+        ================================================== */
+
+        .status-indicator {
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                8px;
+
+            padding:
+                8px 14px;
+
+            border-radius:
+                999px;
+
+            font-size:
+                14px;
+
+            font-weight:
+                700;
+
+            margin-bottom:
+                10px;
+        }
+
+
+        .status-open {
+
+            background:
+                #dcfce7;
+
+            color:
+                #15803d;
+        }
+
+
+        .status-closed {
+
+            background:
+                #fee2e2;
+
+            color:
+                #dc2626;
+        }
+
+
+        /* ==================================================
+           DESCRIPTION
+        ================================================== */
+
+        .description {
+
+            color:
+                var(--text-secondary);
+
+            line-height:
+                1.6;
+
+            font-size:
+                15px;
+
+            margin:
+                15px 0;
+        }
+
+
+        /* ==================================================
+           BACK TO DASHBOARD
+        ================================================== */
+
         .back {
 
-            display: inline-block;
+            display:
+                inline-flex;
 
-            margin-top: 20px;
+            align-items:
+                center;
 
-            padding: 12px 25px;
+            justify-content:
+                center;
 
-            background: #2563eb;
+            gap:
+                8px;
 
-            color: white;
+            margin-top:
+                20px;
 
-            text-decoration: none;
+            padding:
+                13px 26px;
 
-            border-radius: 8px;
+            background:
+                var(--button-background);
 
-            font-weight: bold;
+            color:
+                white;
+
+            text-decoration:
+                none;
+
+            border-radius:
+                10px;
+
+            font-weight:
+                700;
+
+            font-size:
+                15px;
+
+            box-shadow:
+                0 7px 18px
+                rgba(37, 99, 235, 0.25);
+
+            transition:
+                all 0.2s ease;
         }
 
 
         .back:hover {
 
-            background: #1d4ed8;
+            background:
+                var(--button-hover);
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 10px 24px
+                rgba(37, 99, 235, 0.30);
+        }
+
+
+        .back:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        /* ==================================================
+           FOOTER NOTE
+        ================================================== */
+
+        .footer-note {
+
+            margin-top:
+                25px;
+
+            padding-top:
+                18px;
+
+            border-top:
+                1px solid var(--border);
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                13px;
+
+            line-height:
+                1.5;
+        }
+
+
+        /* ==================================================
+           RESPONSIVE
+        ================================================== */
+
+        @media (max-width: 650px) {
+
+            .theme-toggle {
+
+                top:
+                    15px;
+
+                left:
+                    15px;
+
+                width:
+                    44px;
+
+                height:
+                    44px;
+
+                border-radius:
+                    12px;
+            }
+
+
+            .box {
+
+                width:
+                    92%;
+
+                padding:
+                    30px 22px;
+
+                border-radius:
+                    18px;
+            }
+
+
+            h1 {
+
+                font-size:
+                    25px;
+            }
+
+
+            .message {
+
+                font-size:
+                    18px;
+            }
+
+
+            .back {
+
+                width:
+                    100%;
+            }
+
         }
 
     </style>
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='theme.css') }}"
+>
 
 </head>
 
 
 <body>
 
+
+<!-- ==================================================
+     THEME TOGGLE
+================================================== -->
+
+<button
+    type="button"
+    id="themeToggle"
+    class="theme-toggle"
+    aria-label="Toggle theme"
+    title="Toggle light / dark mode"
+>
+
+    🌙
+
+</button>
+
+
+<!-- ==================================================
+     MAIN CARD
+================================================== -->
+
 <div class="box">
+
 
     {% if attendance_open %}
 
-        <h1>
-            📷 Attendance Started
-        </h1>
 
-        <div class="message">
-            🟢 {{ status_message }}
+        <!-- ==================================================
+             ATTENDANCE OPEN
+        ================================================== -->
+
+        <div class="status-indicator status-open">
+
+            🟢
+            Attendance Active
+
         </div>
 
-        <p>
+
+        <h1>
+
+            📷 Attendance Started
+
+        </h1>
+
+
+        <div class="message">
+
+            {{ status_message }}
+
+        </div>
+
+
+        <p class="description">
+
             The attendance camera has been launched.
+
+            <br>
+
+            Face recognition will identify registered
+            students automatically.
+
         </p>
+
 
     {% else %}
 
-        <h1>
-            🔴 Attendance Closed
-        </h1>
 
-        <div class="message">
-            {{ status_message }}
+        <!-- ==================================================
+             ATTENDANCE CLOSED
+        ================================================== -->
+
+        <div class="status-indicator status-closed">
+
+            🔴
+            Attendance Closed
+
         </div>
 
-        <p>
+
+        <h1>
+
+            Attendance Unavailable
+
+        </h1>
+
+
+        <div class="message">
+
+            {{ status_message }}
+
+        </div>
+
+
+        <p class="description">
+
             The attendance system is available only
             during the scheduled attendance hours.
+
         </p>
+
 
     {% endif %}
 
 
+    <!-- ==================================================
+         ATTENDANCE TIME
+    ================================================== -->
+
     <div class="time">
 
-        🕣 Attendance Time
+        🕣
+
+        <strong>
+            Attendance Schedule
+        </strong>
 
         <br><br>
 
         <strong>
+
             {{ start_time }}
+
             &nbsp; → &nbsp;
+
             {{ end_time }}
+
         </strong>
 
     </div>
 
 
-    <a href="/" class="back">
+    <!-- ==================================================
+         BACK TO DASHBOARD
+         
+         IMPORTANT:
+         DO NOT USE href="/"
+         because that route clears the session.
+
+         < a --  code has been 
+         <div class ="Time & Date"
+</div>
+    ================================================== -->
+
+    <a href="{{ url_for('dashboard') }}" class="back">
         ← Back to Dashboard
     </a>
 
+
+    <!-- ==================================================
+         FOOTER
+    ================================================== -->
+
+    <div class="footer-note">
+
+        🔐 Your login session remains active.
+
+        <br>
+
+        You can return to the dashboard without
+        logging in again.
+
+    </div>
+
+
 </div>
 
+
+<!-- ==================================================
+     THEME SCRIPT
+================================================== -->
+
+<script>
+
+    const themeToggle =
+        document.getElementById(
+            "themeToggle"
+        );
+
+
+    function applyTheme(theme) {
+
+        if (theme === "dark") {
+
+            document.body.classList.add(
+                "dark-theme"
+            );
+
+            themeToggle.textContent =
+                "☀️";
+
+            themeToggle.title =
+                "Switch to light mode";
+
+        } else {
+
+            document.body.classList.remove(
+                "dark-theme"
+            );
+
+            themeToggle.textContent =
+                "🌙";
+
+            themeToggle.title =
+                "Switch to dark mode";
+        }
+
+    }
+
+
+    /* ==================================================
+       LOAD SAVED THEME
+    ================================================== */
+
+    const savedTheme =
+        localStorage.getItem(
+            "attendance_theme"
+        );
+
+
+    if (savedTheme === "dark") {
+
+        applyTheme("dark");
+
+    } else {
+
+        applyTheme("light");
+
+    }
+
+
+    /* ==================================================
+       TOGGLE THEME
+    ================================================== */
+
+    themeToggle.addEventListener(
+        "click",
+        function () {
+
+            const isDark =
+                document.body.classList.contains(
+                    "dark-theme"
+                );
+
+
+            if (isDark) {
+
+                applyTheme("light");
+
+                localStorage.setItem(
+                    "attendance_theme",
+                    "light"
+                );
+
+            } else {
+
+                applyTheme("dark");
+
+                localStorage.setItem(
+                    "attendance_theme",
+                    "dark"
+                );
+
+            }
+
+        }
+    );
+
+</script>
+
+
 </body>
+
+<script
+    src="{{ url_for('static', filename='theme.js') }}"
+></script>
 
 </html>

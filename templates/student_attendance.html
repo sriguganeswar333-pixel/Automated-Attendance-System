@@ -29,9 +29,9 @@
                 Helvetica,
                 sans-serif;
 
-            background: #f4f7fb;
+            background: var(--bg-color);
 
-            color: #222;
+            color: var(--text-primary);
         }
 
 
@@ -274,7 +274,52 @@
             }
         }
 
+    
+        .profile-card,
+        .summary-card,
+        .table-card {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            box-shadow: var(--shadow) !important;
+        }
+        .profile-info h1,
+        .summary-card h2,
+        .table-card h2 {
+            color: var(--text-primary) !important;
+        }
+        .profile-info p,
+        .summary-card p {
+            color: var(--text-secondary) !important;
+        }
+        table th {
+            background: var(--table-header-bg) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        table td {
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        table tr:hover td {
+            background: var(--input-bg) !important;
+        }
+        .back-btn {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+        .back-btn:hover {
+            border-color: var(--primary-color) !important;
+            color: var(--primary-color) !important;
+        }
+
     </style>
+
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='theme.css') }}"
+>
 
 </head>
 
@@ -309,35 +354,37 @@
         <div class="student-info">
 
             <div>
-
-                <strong>
-                    Student ID:
-                </strong>
-
-                {{ student["student_id"] }}
-
+                <strong>Student ID:</strong>
+                #{{ student["student_id"] }}
             </div>
 
-
+            {% if institution_type == 'college' %}
             <div>
-
-                <strong>
-                    Class:
-                </strong>
-
+                <strong>Register Number:</strong>
+                {{ student["roll_number"] if student["roll_number"] else '—' }}
+            </div>
+            <div>
+                <strong>Department:</strong>
+                {{ student["department"] if student["department"] else student["class_name"] }}
+            </div>
+            <div>
+                <strong>Year:</strong>
+                {{ student["year"] if student["year"] else '—' }}
+            </div>
+            {% else %}
+            <div>
+                <strong>Roll Number:</strong>
+                {{ student["roll_number"] if student["roll_number"] else '—' }}
+            </div>
+            <div>
+                <strong>Class:</strong>
                 {{ student["class_name"] }}
-
             </div>
-
+            {% endif %}
 
             <div>
-
-                <strong>
-                    Section:
-                </strong>
-
+                <strong>Section:</strong>
                 {{ student["section"] }}
-
             </div>
 
         </div>
@@ -536,5 +583,9 @@
 
 
 </body>
+
+<script
+    src="{{ url_for('static', filename='theme.js') }}"
+></script>
 
 </html>

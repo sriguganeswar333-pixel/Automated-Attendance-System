@@ -1,749 +1,1157 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>Automated Attendance System</title>
+    <title>Attendance Dashboard</title>
 
-<style>
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='theme.css') }}"
+    >
 
-    /* ==================================================
-       GLOBAL
-    ================================================== */
+    <style>
 
-    * {
-        box-sizing: border-box;
-    }
+        /* ============================================================
+           DASHBOARD LAYOUT
+        ============================================================ */
 
-
-    /* ==================================================
-       BODY - SOFT ANIMATED BACKGROUND
-    ================================================== */
-
-    body {
-
-        margin: 0;
-
-        min-height: 100vh;
-
-        font-family:
-            Arial,
-            Helvetica,
-            sans-serif;
-
-        color: #1f2937;
-
-        /* Soft colors */
-
-        background: linear-gradient(
-            120deg,
-            #dbeafe,
-            #ede9fe,
-            #fce7f3,
-            #e0f2fe,
-            #f3e8ff
-        );
-
-        background-size: 500% 500%;
-
-        /* Slow smooth animation */
-
-        animation:
-            softColorFlow
-            6s
-            ease-in-out
-            infinite;
-    }
-
-
-    /* ==================================================
-       BACKGROUND ANIMATION
-    ================================================== */
-
-    @keyframes softColorFlow {
-
-        0% {
-
-            background-position:
-                0% 50%;
-
+        * {
+            box-sizing: border-box;
         }
 
-        20% {
-
-            background-position:
-                25% 100%;
-
+        html {
+            scroll-behavior: smooth;
         }
 
-        40% {
-
-            background-position:
-                75% 75%;
-
-        }
-
-        60% {
-
-            background-position:
-                100% 25%;
-
-        }
-
-        80% {
-
-            background-position:
-                50% 0%;
-
-        }
-
-        100% {
-
-            background-position:
-                0% 50%;
-
-        }
-
-    }
-
-
-    /* ==================================================
-       MAIN CONTAINER
-    ================================================== */
-
-    .container {
-
-        width: 95%;
-
-        max-width: 1450px;
-
-        margin:
-            30px auto
-            50px;
-
-    }
-
-
-    /* ==================================================
-       HEADER
-    ================================================== */
-
-    .header {
-
-        background:
-            rgba(255, 255, 255, 0.96);
-
-        padding:
-            28px 32px;
-
-        border-radius:
-            18px;
-
-        box-shadow:
-            0 5px 20px
-            rgba(0, 0, 0, 0.08);
-
-        margin-bottom:
-            25px;
-
-        backdrop-filter:
-            blur(6px);
-    }
-
-
-    .header h1 {
-
-        margin: 0;
-
-        font-size: 32px;
-
-        color:
-            #111827;
-    }
-
-
-    .header p {
-
-        margin:
-            8px 0 0;
-
-        color:
-            #6b7280;
-    }
-
-
-    /* ==================================================
-       ATTENDANCE CONTROL
-    ================================================== */
-
-    .attendance-control {
-
-        background:
-            rgba(255, 255, 255, 0.96);
-
-        padding:
-            25px;
-
-        border-radius:
-            18px;
-
-        box-shadow:
-            0 5px 20px
-            rgba(0, 0, 0, 0.08);
-
-        margin-bottom:
-            25px;
-
-        backdrop-filter:
-            blur(6px);
-    }
-
-
-    .attendance-control h2 {
-
-        margin:
-            0 0 15px;
-    }
-
-
-    .status-row {
-
-        display:
-            flex;
-
-        justify-content:
-            space-between;
-
-        align-items:
-            center;
-
-        gap:
-            20px;
-
-        flex-wrap:
-            wrap;
-    }
-
-
-    .time-box {
-
-        color:
-            #6b7280;
-
-        font-size:
-            15px;
-    }
-
-
-    .time-box strong {
-
-        color:
-            #111827;
-
-        font-size:
-            20px;
-    }
-
-
-    /* ==================================================
-       ATTENDANCE STATUS
-    ================================================== */
-
-    .status {
-
-        padding:
-            10px 16px;
-
-        border-radius:
-            10px;
-
-        font-weight:
-            700;
-
-        display:
-            inline-block;
-    }
-
-
-    .status-open {
-
-        background:
-            #dcfce7;
-
-        color:
-            #15803d;
-    }
-
-
-    .status-closed {
-
-        background:
-            #fee2e2;
-
-        color:
-            #dc2626;
-    }
-
-
-    .status-not-started {
-
-        background:
-            #fef3c7;
-
-        color:
-            #92400e;
-    }
-
-
-    /* ==================================================
-       TAKE ATTENDANCE BUTTON
-    ================================================== */
-
-    .take-button {
-
-        display:
-            inline-block;
-
-        padding:
-            14px 25px;
-
-        border-radius:
-            10px;
-
-        text-decoration:
-            none;
-
-        font-weight:
-            800;
-
-        font-size:
-            15px;
-
-        background:
-            #2563eb;
-
-        color:
-            white;
-
-        transition:
-            0.2s;
-    }
-
-
-    .take-button:hover {
-
-        background:
-            #1d4ed8;
-
-        transform:
-            translateY(-1px);
-    }
-
-
-    .take-button.disabled {
-
-        background:
-            #9ca3af;
-
-        cursor:
-            not-allowed;
-
-        pointer-events:
-            none;
-    }
-
-
-    .attendance-message {
-
-        margin-top:
-            15px;
-
-        padding:
-            13px 16px;
-
-        border-radius:
-            10px;
-
-        background:
-            #f3f4f6;
-
-        color:
-            #374151;
-    }
-
-
-    /* ==================================================
-       SUMMARY
-    ================================================== */
-
-    .summary-grid {
-
-        display:
-            grid;
-
-        grid-template-columns:
-            repeat(4, 1fr);
-
-        gap:
-            20px;
-
-        margin-bottom:
-            25px;
-    }
-
-
-    .summary-card {
-
-        background:
-            rgba(255, 255, 255, 0.96);
-
-        padding:
-            25px;
-
-        border-radius:
-            16px;
-
-        box-shadow:
-            0 5px 20px
-            rgba(0, 0, 0, 0.07);
-
-        backdrop-filter:
-            blur(6px);
-
-        transition:
-            0.25s;
-    }
-
-
-    .summary-card:hover {
-
-        transform:
-            translateY(-4px);
-
-        box-shadow:
-            0 10px 28px
-            rgba(0, 0, 0, 0.12);
-    }
-
-
-    .summary-title {
-
-        color:
-            #6b7280;
-
-        font-size:
-            14px;
-
-        font-weight:
-            600;
-
-        margin-bottom:
-            10px;
-    }
-
-
-    .summary-value {
-
-        font-size:
-            30px;
-
-        font-weight:
-            800;
-
-        color:
-            #111827;
-    }
-
-
-    /* ==================================================
-       NAVIGATION
-    ================================================== */
-
-    .navigation {
-
-        display:
-            flex;
-
-        gap:
-            15px;
-
-        flex-wrap:
-            wrap;
-
-        margin-bottom:
-            25px;
-    }
-
-
-    .nav-button {
-
-        background:
-            rgba(255, 255, 255, 0.96);
-
-        color:
-            #111827;
-
-        padding:
-            13px 20px;
-
-        border-radius:
-            10px;
-
-        text-decoration:
-            none;
-
-        font-weight:
-            700;
-
-        box-shadow:
-            0 4px 15px
-            rgba(0, 0, 0, 0.06);
-
-        transition:
-            0.2s;
-
-        backdrop-filter:
-            blur(6px);
-    }
-
-
-    .nav-button:hover {
-
-        background:
-            white;
-
-        transform:
-            translateY(-2px);
-    }
-
-
-    /* ==================================================
-       CLASS TRACKING
-    ================================================== */
-
-    .section-title {
-
-        margin:
-            30px 0 15px;
-
-        font-size:
-            25px;
-
-        color:
-            #111827;
-    }
-
-
-    .class-grid {
-
-        display:
-            grid;
-
-        grid-template-columns:
-            repeat(3, 1fr);
-
-        gap:
-            20px;
-    }
-
-
-    .class-card {
-
-        background:
-            rgba(255, 255, 255, 0.96);
-
-        padding:
-            22px;
-
-        border-radius:
-            16px;
-
-        box-shadow:
-            0 5px 20px
-            rgba(0, 0, 0, 0.06);
-
-        backdrop-filter:
-            blur(6px);
-
-        transition:
-            0.25s;
-    }
-
-
-    .class-card:hover {
-
-        transform:
-            translateY(-4px);
-
-        box-shadow:
-            0 10px 25px
-            rgba(0, 0, 0, 0.10);
-    }
-
-
-    .class-card h3 {
-
-        margin:
-            0 0 8px;
-
-        font-size:
-            20px;
-    }
-
-
-    .class-card p {
-
-        margin:
-            5px 0;
-
-        color:
-            #6b7280;
-    }
-
-
-    .class-link {
-
-        display:
-            inline-block;
-
-        margin-top:
-            12px;
-
-        text-decoration:
-            none;
-
-        color:
-            #2563eb;
-
-        font-weight:
-            700;
-    }
-
-
-    /* ==================================================
-       INFORMATION BOX
-    ================================================== */
-
-    .info-box {
-
-        background:
-            rgba(255, 255, 255, 0.96);
-
-        padding:
-            25px;
-
-        border-radius:
-            18px;
-
-        box-shadow:
-            0 5px 20px
-            rgba(0, 0, 0, 0.07);
-
-        margin-top:
-            25px;
-
-        backdrop-filter:
-            blur(6px);
-    }
-
-
-    .info-box h2 {
-
-        margin-top:
-            0;
-    }
-
-
-    .info-box p {
-
-        color:
-            #6b7280;
-
-        line-height:
-            1.6;
-    }
-
-
-    /* ==================================================
-       RESPONSIVE
-    ================================================== */
-
-    @media (max-width: 1100px) {
-
-        .summary-grid {
-
-            grid-template-columns:
-                repeat(2, 1fr);
+        body {
+            margin: 0;
+            padding: 0;
+            padding-left: 286px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
         }
 
 
-        .class-grid {
+        /* ============================================================
+           SIDEBAR
+        ============================================================ */
 
-            grid-template-columns:
-                repeat(2, 1fr);
+        .sidebar {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+            bottom: 0;
+
+            width: 286px;
+
+            background: var(--card-bg);
+
+            border-right:
+                1px solid var(--border-color);
+
+            display: flex;
+
+            flex-direction: column;
+
+            padding: 25px 18px;
+
+            z-index: 1000;
+
+            overflow-y: auto;
+
+            box-shadow:
+                4px 0 18px
+                rgba(15, 23, 42, 0.04);
         }
 
-    }
+
+        /* ============================================================
+           SIDEBAR BRAND
+        ============================================================ */
+
+        .sidebar-brand {
+
+            padding:
+                10px 12px
+                25px;
+
+            border-bottom:
+                1px solid var(--border-color);
+
+            margin-bottom: 22px;
+        }
+
+        .sidebar-brand h2 {
+
+            margin: 0;
+
+            color:
+                var(--text-primary);
+
+            font-size: 24px;
+
+            font-weight: 700;
+        }
+
+        .sidebar-brand p {
+
+            margin:
+                8px 0 0;
+
+            color:
+                var(--text-secondary);
+
+            font-size: 14px;
+        }
 
 
-    @media (max-width: 650px) {
+        /* ============================================================
+           SIDEBAR NAVIGATION
+        ============================================================ */
 
-        .container {
+        .sidebar-nav {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+        .sidebar-nav a {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            min-height: 55px;
+
+            padding:
+                0 18px;
+
+            border-radius: 13px;
+
+            color:
+                var(--text-secondary);
+
+            text-decoration: none;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .sidebar-nav a:hover {
+
+            background:
+                var(--input-bg);
+
+            color:
+                var(--primary-color);
+
+            transform:
+                translateX(2px);
+        }
+
+        .sidebar-nav a.active {
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #2563eb,
+                    #4f46e5
+                );
+
+            color: white;
+
+            box-shadow:
+                0 8px 18px
+                rgba(37, 99, 235, 0.22);
+        }
+
+        .sidebar-icon {
+
+            width: 25px;
+
+            min-width: 25px;
+
+            text-align: center;
+
+            font-size: 19px;
+        }
+
+
+        /* ============================================================
+           SIDEBAR BOTTOM
+        ============================================================ */
+
+        .sidebar-bottom {
+
+            margin-top: auto;
+
+            padding-top: 18px;
+
+            border-top:
+                1px solid var(--border-color);
+        }
+
+
+        /* ============================================================
+           DARK MODE BUTTON
+        ============================================================ */
+
+        .dark-mode-button {
+
+            width: 100%;
+
+            min-height: 55px;
+
+            border: none;
+
+            border-radius: 13px;
+
+            background:
+                transparent;
+
+            color:
+                var(--text-primary);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            padding:
+                0 18px;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            text-align: left;
+
+            transition:
+                background 0.2s ease;
+        }
+
+        .dark-mode-button:hover {
+
+            background:
+                var(--input-bg);
+        }
+
+
+        /* ============================================================
+           LOGOUT
+        ============================================================ */
+
+        .logout-button {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+            width: 100%;
+
+            min-height: 55px;
+
+            margin-top: 8px;
+
+            padding:
+                0 18px;
+
+            border-radius: 13px;
+
+            background:
+                rgba(220, 38, 38, 0.08);
+
+            color:
+                #dc2626;
+
+            text-decoration: none;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            transition:
+                background 0.2s ease;
+        }
+
+        .logout-button:hover {
+
+            background:
+                rgba(220, 38, 38, 0.14);
+        }
+
+
+        /* ============================================================
+           MAIN CONTENT
+        ============================================================ */
+
+        .main-content {
 
             width:
-                92%;
+                calc(100% - 0px);
+
+            min-height: 100vh;
+
+            padding:
+                35px 35px 45px;
         }
 
 
-        .summary-grid {
+        /* ============================================================
+           TOP HEADER
+        ============================================================ */
 
-            grid-template-columns:
-                1fr;
-        }
+        .dashboard-header {
 
+            background:
+                var(--card-bg);
 
-        .class-grid {
+            border:
+                1px solid var(--border-color);
 
-            grid-template-columns:
-                1fr;
-        }
+            border-radius:
+                22px;
 
+            padding:
+                30px 32px;
 
-        .header h1 {
+            margin-bottom:
+                28px;
 
-            font-size:
-                25px;
-        }
-
-
-        .status-row {
+            display:
+                flex;
 
             align-items:
-                flex-start;
+                center;
 
-            flex-direction:
-                column;
+            justify-content:
+                space-between;
+
+            gap:
+                25px;
+
+            box-shadow:
+                var(--shadow);
+        }
+
+        .dashboard-header-text h1 {
+
+            margin:
+                0 0 8px;
+
+            font-size:
+                30px;
+
+            color:
+                var(--text-primary);
+        }
+
+        .dashboard-header-text p {
+
+            margin: 0;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                15px;
         }
 
 
-        .take-button {
+        /* ============================================================
+           INDIA TIME
+        ============================================================ */
 
-            width:
-                100%;
+        .india-time {
+
+            min-width:
+                175px;
+
+            padding:
+                14px 18px;
+
+            border:
+                1px solid var(--border-color);
+
+            border-radius:
+                14px;
+
+            background:
+                var(--input-bg);
 
             text-align:
                 center;
         }
 
-    }
+        .india-time-label {
 
-</style>
+            display:
+                block;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                12px;
+
+            margin-bottom:
+                4px;
+        }
+
+        .india-time-value {
+
+            display:
+                block;
+
+            color:
+                var(--primary-color);
+
+            font-size:
+                18px;
+
+            font-weight:
+                700;
+        }
+
+
+        /* ============================================================
+           ATTENDANCE CONTROL CARD
+        ============================================================ */
+
+        .attendance-control {
+
+            background:
+                var(--card-bg);
+
+            border:
+                1px solid var(--border-color);
+
+            border-radius:
+                22px;
+
+            padding:
+                30px;
+
+            margin-bottom:
+                28px;
+
+            box-shadow:
+                var(--shadow);
+        }
+
+        .attendance-control-header {
+
+            display:
+                flex;
+
+            align-items:
+                flex-start;
+
+            justify-content:
+                space-between;
+
+            gap:
+                25px;
+        }
+
+        .attendance-control-title h2 {
+
+            margin:
+                0 0 7px;
+
+            color:
+                var(--text-primary);
+
+            font-size:
+                23px;
+        }
+
+        .attendance-control-title p {
+
+            margin: 0;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                14px;
+        }
+
+
+        /* ============================================================
+           STATUS + TAKE ATTENDANCE
+        ============================================================ */
+
+        .attendance-actions {
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            align-items:
+                flex-end;
+
+            gap:
+                14px;
+        }
+
+        .attendance-status {
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            gap:
+                8px;
+
+            padding:
+                12px 20px;
+
+            border-radius:
+                12px;
+
+            font-size:
+                14px;
+
+            font-weight:
+                700;
+        }
+
+        .attendance-status.open {
+
+            background:
+                #dcfce7;
+
+            color:
+                #15803d;
+        }
+
+        .attendance-status.closed {
+
+            background:
+                #fee2e2;
+
+            color:
+                #dc2626;
+        }
+
+        .attendance-status.not-started {
+
+            background:
+                #fef3c7;
+
+            color:
+                #b45309;
+        }
+
+
+        .take-attendance-button {
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            gap:
+                10px;
+
+            min-width:
+                228px;
+
+            min-height:
+                53px;
+
+            padding:
+                0 24px;
+
+            border-radius:
+                12px;
+
+            background:
+                #2563eb;
+
+            color:
+                white;
+
+            text-decoration:
+                none;
+
+            font-size:
+                16px;
+
+            font-weight:
+                700;
+
+            transition:
+                0.2s ease;
+        }
+
+        .take-attendance-button:hover {
+
+            background:
+                #1d4ed8;
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 8px 18px
+                rgba(37, 99, 235, 0.25);
+        }
+
+        .take-attendance-button.disabled {
+
+            background:
+                #94a3b8;
+
+            cursor:
+                not-allowed;
+
+            pointer-events:
+                none;
+        }
+
+
+        /* ============================================================
+           SCHEDULE INFORMATION
+        ============================================================ */
+
+        .schedule-info {
+
+            margin-top:
+                24px;
+
+            padding:
+                20px;
+
+            border:
+                1px solid var(--border-color);
+
+            border-radius:
+                14px;
+
+            background:
+                var(--input-bg);
+        }
+
+        .schedule-info p {
+
+            margin:
+                0 0 7px;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                14px;
+        }
+
+        .schedule-info p:last-child {
+
+            margin-bottom:
+                0;
+        }
+
+        .schedule-info strong {
+
+            color:
+                var(--text-primary);
+        }
+
+
+        /* ============================================================
+           SUMMARY CARDS
+        ============================================================ */
+
+        .summary-grid {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap:
+                18px;
+
+            margin-bottom:
+                30px;
+        }
+
+        .summary-card {
+
+            min-width:
+                0;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                15px;
+
+            padding:
+                23px;
+
+            background:
+                var(--card-bg);
+
+            border:
+                1px solid var(--border-color);
+
+            border-top:
+                4px solid var(--primary-color);
+
+            border-radius:
+                17px;
+
+            box-shadow:
+                var(--shadow);
+        }
+
+        .summary-icon {
+
+            width:
+                50px;
+
+            height:
+                50px;
+
+            min-width:
+                50px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius:
+                13px;
+
+            font-size:
+                21px;
+        }
+
+        .summary-icon.blue {
+
+            background:
+                rgba(37, 99, 235, 0.12);
+
+            color:
+                #2563eb;
+        }
+
+        .summary-icon.green {
+
+            background:
+                rgba(22, 163, 74, 0.12);
+
+            color:
+                #16a34a;
+        }
+
+        .summary-icon.red {
+
+            background:
+                rgba(220, 38, 38, 0.12);
+
+            color:
+                #dc2626;
+        }
+
+        .summary-icon.purple {
+
+            background:
+                rgba(124, 58, 237, 0.12);
+
+            color:
+                #7c3aed;
+        }
+
+        .summary-card span {
+
+            display:
+                block;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                14px;
+
+            margin-bottom:
+                5px;
+        }
+
+        .summary-card strong {
+
+            display:
+                block;
+
+            color:
+                var(--text-primary);
+
+            font-size:
+                26px;
+        }
+
+
+        /* ============================================================
+           OVERVIEW
+        ============================================================ */
+
+        .overview-title {
+
+            margin:
+                0 0 20px;
+
+            color:
+                var(--text-primary);
+
+            font-size:
+                23px;
+        }
+
+        .overview-grid {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap:
+                22px;
+        }
+
+        .overview-card {
+
+            background:
+                var(--card-bg);
+
+            border:
+                1px solid var(--border-color);
+
+            border-radius:
+                18px;
+
+            padding:
+                25px;
+
+            box-shadow:
+                var(--shadow);
+        }
+
+        .overview-card h3 {
+
+            margin:
+                0 0 7px;
+
+            color:
+                var(--text-primary);
+
+            font-size:
+                20px;
+        }
+
+        .overview-card > p {
+
+            margin:
+                0 0 20px;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                14px;
+        }
+
+        .overview-info {
+
+            padding:
+                18px;
+
+            border:
+                1px solid var(--border-color);
+
+            border-radius:
+                13px;
+
+            background:
+                var(--input-bg);
+        }
+
+        .overview-row {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                15px;
+
+            padding:
+                10px 0;
+
+            border-bottom:
+                1px solid var(--border-color);
+        }
+
+        .overview-row:first-child {
+
+            padding-top:
+                0;
+        }
+
+        .overview-row:last-child {
+
+            border-bottom:
+                none;
+
+            padding-bottom:
+                0;
+        }
+
+        .overview-row span {
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                14px;
+        }
+
+        .overview-row strong {
+
+            color:
+                var(--text-primary);
+
+            font-size:
+                14px;
+        }
+
+
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
+
+        @media (max-width: 1100px) {
+
+            .summary-grid {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .charts-section-grid {
+
+                grid-template-columns:
+                    1fr !important;
+            }
+
+            .overview-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+        }
+
+
+        @media (max-width: 800px) {
+
+            body {
+
+                padding-left:
+                    0;
+            }
+
+            .sidebar {
+
+                position:
+                    relative;
+
+                width:
+                    100%;
+
+                height:
+                    auto;
+
+                min-height:
+                    auto;
+
+                padding:
+                    15px;
+
+                border-right:
+                    none;
+
+                border-bottom:
+                    1px solid var(--border-color);
+            }
+
+            .sidebar-brand {
+
+                margin-bottom:
+                    12px;
+            }
+
+            .sidebar-nav {
+
+                display:
+                    grid;
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .sidebar-bottom {
+
+                margin-top:
+                    15px;
+            }
+
+            .main-content {
+
+                padding:
+                    20px;
+            }
+
+            .dashboard-header {
+
+                flex-direction:
+                    column;
+
+                align-items:
+                    stretch;
+            }
+
+            .india-time {
+
+                width:
+                    100%;
+            }
+
+            .attendance-control-header {
+
+                flex-direction:
+                    column;
+            }
+
+            .attendance-actions {
+
+                align-items:
+                    stretch;
+            }
+
+            .take-attendance-button {
+
+                width:
+                    100%;
+            }
+        }
+
+
+        @media (max-width: 550px) {
+
+            .main-content {
+
+                padding:
+                    15px;
+            }
+
+            .sidebar-nav {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+            .summary-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+            .dashboard-header {
+
+                padding:
+                    22px;
+            }
+
+            .dashboard-header-text h1 {
+
+                font-size:
+                    25px;
+            }
+
+            .attendance-control {
+
+                padding:
+                    22px;
+            }
+
+            .attendance-control-title h2 {
+
+                font-size:
+                    20px;
+            }
+
+            .overview-card {
+
+                padding:
+                    20px;
+            }
+        }
+
+    </style>
 
 </head>
 
@@ -751,489 +1159,933 @@
 <body>
 
 
-<div class="container">
+<!-- ============================================================
+     SIDEBAR
+============================================================ -->
+
+<aside class="sidebar">
 
 
-<!-- ==================================================
-     HEADER
-================================================== -->
+    <!-- BRAND -->
 
-<div class="header">
+    <div class="sidebar-brand">
 
-    <h1>
-        🎓 Automated Attendance System
-    </h1>
+        <h2>
+            🎓 Attendance
+        </h2>
 
-    <p>
-        Smart student attendance and face recognition
-        management system.
-    </p>
+        <p>
+            Smart Attendance Management
+        </p>
 
-</div>
+    </div>
 
 
-<!-- ==================================================
-     ATTENDANCE CONTROL
-================================================== -->
+    <!-- NAVIGATION -->
 
-<div class="attendance-control">
+    <nav class="sidebar-nav">
 
-    <h2>
-        📷 Today's Attendance
-    </h2>
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="active"
+        >
 
-
-    <div class="status-row">
-
-
-        <div class="time-box">
-
-            Current India Time:
-
-            <br>
-
-            <strong id="currentTime">
-                {{ current_time }}
-            </strong>
-
-        </div>
-
-
-        <div>
-
-            {% if attendance_status["status"] == "open" %}
-
-                <span class="status status-open">
-                    🟢 Attendance Open
-                </span>
-
-            {% elif attendance_status["status"] == "not_started" %}
-
-                <span class="status status-not-started">
-                    🟡 Attendance Not Started
-                </span>
-
-            {% else %}
-
-                <span class="status status-closed">
-                    🔴 Attendance Closed
-                </span>
-
-            {% endif %}
-
-        </div>
-
-
-        {% if attendance_status["can_take"] %}
-
-            <a
-                href="{{ url_for('take_attendance') }}"
-                class="take-button"
-            >
-
-                📷 Take Attendance
-
-            </a>
-
-        {% else %}
-
-            <span
-                class="take-button disabled"
-            >
-
-                📷 Attendance Unavailable
-
+            <span class="sidebar-icon">
+                🏠
             </span>
 
-        {% endif %}
+            <span>
+                Dashboard
+            </span>
 
-    </div>
-
-
-    <div class="attendance-message">
-
-        {{ attendance_status["message"] }}
-
-        <br>
-
-        <strong>
-            Attendance Time:
-        </strong>
-
-        {{ attendance_start }}
-
-        -
-
-        {{ attendance_end }}
-
-    </div>
-
-</div>
+        </a>
 
 
-<!-- ==================================================
-     SUMMARY
-================================================== -->
+        <a href="{{ url_for('students') }}">
 
-<div class="summary-grid">
+            <span class="sidebar-icon">
+                🧑‍🎓
+            </span>
 
+            <span>
+                Student Management
+            </span>
 
-    <!-- TOTAL STUDENTS -->
-
-    <div class="summary-card">
-
-        <div class="summary-title">
-
-            👥 Total Students
-
-        </div>
-
-        <div class="summary-value">
-
-            {{ total_students }}
-
-        </div>
-
-    </div>
+        </a>
 
 
-    <!-- PRESENT -->
+        <a href="{{ url_for('add_student') }}">
 
-    <div class="summary-card">
+            <span class="sidebar-icon">
+                ➕
+            </span>
 
-        <div class="summary-title">
+            <span>
+                Add Student
+            </span>
 
-            ✅ Present Today
+        </a>
 
-        </div>
 
-        <div
-            class="summary-value"
-            style="color:#15803d;"
+        <a href="{{ url_for('take_attendance') }}">
+
+            <span class="sidebar-icon">
+                📷
+            </span>
+
+            <span>
+                Take Attendance
+            </span>
+
+        </a>
+
+
+        <a href="{{ url_for('attendance_reports') }}">
+
+            <span class="sidebar-icon">
+                📊
+            </span>
+
+            <span>
+                Attendance Reports
+            </span>
+
+        </a>
+
+
+        <a href="{{ url_for('attendance_setup') }}">
+
+            <span class="sidebar-icon">
+                ⚙️
+            </span>
+
+            <span>
+                Attendance Schedule
+            </span>
+
+        </a>
+
+    </nav>
+
+
+    <!-- BOTTOM -->
+
+    <div class="sidebar-bottom">
+
+
+        <!-- DARK MODE -->
+
+        <button
+            type="button"
+            id="themeToggle"
+            class="dark-mode-button"
+            title="Toggle dark mode"
         >
 
-            {{ present_today }}
+            <span class="sidebar-icon">
+                🌙
+            </span>
 
-        </div>
+            <span>
+                Dark Mode
+            </span>
 
-    </div>
-
-
-    <!-- ABSENT -->
-
-    <div class="summary-card">
-
-        <div class="summary-title">
-
-            ❌ Absent Today
-
-        </div>
-
-        <div
-            class="summary-value"
-            style="color:#dc2626;"
-        >
-
-            {{ absent_today }}
-
-        </div>
-
-    </div>
+        </button>
 
 
-    <!-- RATE -->
-
-    <div class="summary-card">
-
-        <div class="summary-title">
-
-            📈 Attendance Rate
-
-        </div>
-
-        <div
-            class="summary-value"
-            style="color:#2563eb;"
-        >
-
-            {{ attendance_rate }}%
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- ==================================================
-     NAVIGATION
-================================================== -->
-
-<div class="navigation">
-
-
-    <a
-        href="{{ url_for('students') }}"
-        class="nav-button"
-    >
-
-        👨‍🎓 Student Management
-
-    </a>
-
-
-    <a
-        href="{{ url_for('add_student') }}"
-        class="nav-button"
-    >
-
-        ➕ Add Student
-
-    </a>
-
-
-    <a
-        href="{{ url_for('attendance_reports') }}"
-        class="nav-button"
-    >
-
-        📊 Attendance Reports
-
-    </a>
-
-</div>
-
-
-<!-- ==================================================
-     CLASS TRACKING
-================================================== -->
-
-<h2 class="section-title">
-
-    🏫 Class Tracking
-
-</h2>
-
-
-<div class="class-grid">
-
-
-    <!-- CLASS 10 -->
-
-    <div class="class-card">
-
-        <h3>
-
-            📚 Class 10
-
-        </h3>
-
-        <p>
-
-            Track Class 10 students separately.
-
-        </p>
+        <!-- LOGOUT -->
 
         <a
-            href="{{ url_for('students') }}"
-            class="class-link"
+            href="{{ url_for('logout') }}"
+            class="logout-button"
         >
 
-            View Students →
+            <span class="sidebar-icon">
+                🚪
+            </span>
+
+            <span>
+                Logout
+            </span>
 
         </a>
 
     </div>
 
+</aside>
 
-    <!-- CLASS 11 -->
 
-    <div class="class-card">
 
-        <h3>
+<!-- ============================================================
+     MAIN CONTENT
+============================================================ -->
 
-            📚 Class 11
+<main class="main-content">
 
-        </h3>
 
-        <p>
+    <!-- ========================================================
+         HEADER
+    ========================================================= -->
 
-            Track Class 11 students separately.
+    <section class="dashboard-header">
 
-        </p>
 
-        <a
-            href="{{ url_for('students') }}"
-            class="class-link"
-        >
+        <div class="dashboard-header-text">
 
-            View Students →
+            <h1>
+                Attendance Dashboard
+            </h1>
 
-        </a>
+            <p>
+                Monitor attendance activity and daily attendance schedules.
+            </p>
 
+        </div>
+
+
+        <div class="india-time">
+
+            <span class="india-time-label">
+                INDIA STANDARD TIME
+            </span>
+
+            <span
+                class="india-time-value"
+                id="indiaTime"
+            >
+                {{ current_time }}
+            </span>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ========================================================
+         ATTENDANCE CONTROL
+    ========================================================= -->
+
+    <section class="attendance-control">
+
+
+        <div class="attendance-control-header">
+
+
+            <div class="attendance-control-title">
+
+                <h2>
+                    📷 Attendance
+                </h2>
+
+                <p>
+                    Attendance is controlled automatically by your current schedule.
+                </p>
+
+            </div>
+
+
+            <div class="attendance-actions">
+
+
+                {% if attendance_status["status"] == "open" %}
+
+                    <div class="attendance-status open">
+
+                        🟢
+
+                        Attendance Open
+
+                    </div>
+
+                    <a
+                        href="{{ url_for('take_attendance') }}"
+                        class="take-attendance-button"
+                    >
+
+                        📷
+
+                        Take Attendance
+
+                    </a>
+
+
+                {% elif attendance_status["status"] == "not_started" %}
+
+                    <div class="attendance-status not-started">
+
+                        🟡
+
+                        Attendance Not Started
+
+                    </div>
+
+                    <a
+                        href="{{ url_for('take_attendance') }}"
+                        class="take-attendance-button disabled"
+                    >
+
+                        📷
+
+                        Take Attendance
+
+                    </a>
+
+
+                {% else %}
+
+                    <div class="attendance-status closed">
+
+                        🔴
+
+                        Attendance Closed
+
+                    </div>
+
+                    <a
+                        href="{{ url_for('take_attendance') }}"
+                        class="take-attendance-button disabled"
+                    >
+
+                        📷
+
+                        Take Attendance
+
+                    </a>
+
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+
+
+        <!-- SCHEDULE -->
+
+        <div class="schedule-info">
+
+            <p>
+                <strong>
+                    Status:
+                </strong>
+
+                {{ attendance_status["message"] }}
+            </p>
+
+            <p>
+
+                <strong>
+                    Attendance Time:
+                </strong>
+
+                {{ attendance_start }}
+                -
+                {{ attendance_end }}
+
+            </p>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ========================================================
+         SUMMARY
+    ========================================================= -->
+
+    <section class="summary-grid">
+
+
+        <!-- TOTAL STUDENTS -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon blue">
+                👨‍🎓
+            </div>
+
+            <div>
+
+                <span>
+                    Total Students
+                </span>
+
+                <strong>
+                    {{ total_students }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- PRESENT -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon green">
+                ✅
+            </div>
+
+            <div>
+
+                <span>
+                    Present Today
+                </span>
+
+                <strong>
+                    {{ present_today }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- ABSENT -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon red">
+                ❌
+            </div>
+
+            <div>
+
+                <span>
+                    Absent Today
+                </span>
+
+                <strong>
+                    {{ absent_today }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- RATE -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon purple">
+                📈
+            </div>
+
+            <div>
+
+                <span>
+                    Attendance Rate
+                </span>
+
+                <strong>
+                    {{ attendance_rate }}%
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ========================================================
+         PHASE 4: INTERACTIVE VISUAL ANALYTICS
+    ========================================================= -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 35px 0 20px;">
+        <h2 class="overview-title" style="margin: 0;">
+            📊 Visual Attendance Analytics
+        </h2>
+        <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 700; padding: 6px 14px; border-radius: 20px; background: rgba(37, 99, 235, 0.12); color: var(--primary-color);">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2563eb; box-shadow: 0 0 8px #2563eb;"></span>
+            Real-Time Charts
+        </span>
     </div>
 
+    <section class="charts-section-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 25px;">
+        <!-- Card 1: 7-Day Attendance Trend -->
+        <div class="chart-card" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 17px; padding: 22px; box-shadow: var(--shadow); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                        <span>📈</span> 7-Day Attendance Trend
+                    </h3>
+                    <p style="margin: 4px 0 0; font-size: 13px; color: var(--text-secondary);">Daily verified student turnout across the last 7 calendar days</p>
+                </div>
+                <span style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 8px; background: var(--input-bg); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                    Past 7 Days
+                </span>
+            </div>
+            <div style="position: relative; height: 260px; width: 100%; flex: 1;">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
 
-    <!-- CLASS 12 -->
+        <!-- Card 2: Today's Ratio (Present vs Absent) -->
+        <div class="chart-card" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 17px; padding: 22px; box-shadow: var(--shadow); display: flex; flex-direction: column;">
+            <div style="margin-bottom: 15px;">
+                <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                    <span>🎯</span> Today's Ratio
+                </h3>
+                <p style="margin: 4px 0 0; font-size: 13px; color: var(--text-secondary);">Present vs Absent distribution</p>
+            </div>
+            <div style="position: relative; height: 260px; width: 100%; display: flex; align-items: center; justify-content: center; flex: 1;">
+                <canvas id="ratioChart"></canvas>
+            </div>
+        </div>
+    </section>
 
-    <div class="class-card">
-
-        <h3>
-
-            📚 Class 12
-
-        </h3>
-
-        <p>
-
-            Track Class 12 students separately.
-
-        </p>
-
-        <a
-            href="{{ url_for('students') }}"
-            class="class-link"
-        >
-
-            View Students →
-
-        </a>
-
-    </div>
-
-</div>
+    <!-- Card 3: Class-Wise Attendance Rate (%) -->
+    {% if class_labels and class_labels|length > 0 %}
+    <section style="margin-bottom: 35px;">
+        <div class="chart-card" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 17px; padding: 22px; box-shadow: var(--shadow);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                        <span>🏫</span> Class-Wise Attendance Rate (%)
+                    </h3>
+                    <p style="margin: 4px 0 0; font-size: 13px; color: var(--text-secondary);">Real-time attendance percentage turnout categorized by class and section</p>
+                </div>
+                <span style="font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.25);">
+                    Live Turnout
+                </span>
+            </div>
+            <div style="position: relative; height: 230px; width: 100%;">
+                <canvas id="classChart"></canvas>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
 
-<!-- ==================================================
-     SYSTEM INFORMATION
-================================================== -->
 
-<div class="info-box">
+    <!-- ========================================================
+         OVERVIEW
+    ========================================================= -->
 
-    <h2>
-
-        ℹ️ Attendance System Information
-
+    <h2 class="overview-title">
+        📋 Today's Overview
     </h2>
 
 
-    <p>
-
-        The attendance system automatically allows
-        attendance only between
-
-        <strong>
-            08:30 AM
-        </strong>
-
-        and
-
-        <strong>
-            04:00 PM
-        </strong>
-
-        India Standard Time.
-
-    </p>
+    <section class="overview-grid">
 
 
-    <p>
+        <!-- ATTENDANCE SCHEDULE -->
 
-        Each student can be marked present only once
-        per day. Attendance is automatically available
-        again on the next day.
+        <div class="overview-card">
 
-    </p>
+            <h3>
+                🕒 Attendance Schedule
+            </h3>
 
-
-    <p>
-
-        Face recognition identifies the registered
-        student and stores the attendance date,
-        time and student ID in the database.
-
-    </p>
-
-</div>
+            <p>
+                Current schedule applied to today's attendance system.
+            </p>
 
 
-</div>
+            <div class="overview-info">
 
 
-<!-- ==================================================
-     LIVE CLOCK
-================================================== -->
+                <div class="overview-row">
+
+                    <span>
+                        Start Time
+                    </span>
+
+                    <strong>
+                        {{ attendance_start }}
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-row">
+
+                    <span>
+                        End Time
+                    </span>
+
+                    <strong>
+                        {{ attendance_end }}
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-row">
+
+                    <span>
+                        Current Status
+                    </span>
+
+                    <strong>
+                        {{ attendance_status["label"] }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- SYSTEM STATUS -->
+
+        <div class="overview-card">
+
+            <h3>
+                🔎 System Status
+            </h3>
+
+            <p>
+                Quick information about today's attendance operation.
+            </p>
+
+
+            <div class="overview-info">
+
+
+                <div class="overview-row">
+
+                    <span>
+                        Current Time
+                    </span>
+
+                    <strong id="overviewTime">
+                        {{ current_time }}
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-row">
+
+                    <span>
+                        Students Registered
+                    </span>
+
+                    <strong>
+                        {{ total_students }}
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-row">
+
+                    <span>
+                        Present Today
+                    </span>
+
+                    <strong>
+                        {{ present_today }}
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-row">
+
+                    <span>
+                        Attendance Rate
+                    </span>
+
+                    <strong>
+                        {{ attendance_rate }}%
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- ============================================================
+     LIVE INDIA TIME
+============================================================ -->
 
 <script>
+    function updateIndiaTime() {
+        const now = new Date();
+        const options = {
+            timeZone: "Asia/Kolkata",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        };
 
-function updateClock() {
+        const formatted = new Intl.DateTimeFormat("en-IN", options).format(now);
+        const indiaTime = document.getElementById("indiaTime");
+        const overviewTime = document.getElementById("overviewTime");
 
-    const now =
-        new Date();
+        if (indiaTime) {
+            indiaTime.textContent = formatted;
+        }
+        if (overviewTime) {
+            overviewTime.textContent = formatted;
+        }
+    }
 
-
-    let hour =
-        now.getHours();
-
-
-    const minutes =
-        now.getMinutes()
-        .toString()
-        .padStart(2, "0");
-
-
-    const seconds =
-        now.getSeconds()
-        .toString()
-        .padStart(2, "0");
-
-
-    const ampm =
-        hour >= 12
-        ? "PM"
-        : "AM";
-
-
-    hour =
-        hour % 12 || 12;
-
-
-    const formatted =
-
-        String(hour)
-        .padStart(2, "0")
-
-        + ":"
-
-        + minutes
-
-        + ":"
-
-        + seconds
-
-        + " "
-
-        + ampm;
-
-
-    document.getElementById(
-        "currentTime"
-    ).textContent =
-        formatted;
-
-}
-
-
-updateClock();
-
-
-setInterval(
-    updateClock,
-    1000
-);
-
+    updateIndiaTime();
+    setInterval(updateIndiaTime, 1000);
 </script>
 
+
+<script
+    src="{{ url_for('static', filename='theme.js') }}"
+></script>
+
+<!-- ============================================================
+     PHASE 4: CHART.JS & INTERACTIVE VISUAL ANALYTICS SCRIPT
+============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const trendLabels = {{ trend_labels | tojson }};
+    const trendCounts = {{ trend_counts | tojson }};
+    const presentTodayCount = {{ present_today }};
+    const absentTodayCount = {{ absent_today }};
+    const totalStudentsCount = {{ total_students }};
+    const classLabels = {{ class_labels | tojson }};
+    const classRates = {{ class_rates | tojson }};
+
+    function getChartThemeColors() {
+        const isDark = document.documentElement.classList.contains("dark-theme");
+        return {
+            textColor: isDark ? "#cbd5e1" : "#475569",
+            gridColor: isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)",
+            tooltipBg: isDark ? "#1e293b" : "#0f172a",
+            tooltipText: "#ffffff"
+        };
+    }
+
+    let trendChartInstance = null;
+    let ratioChartInstance = null;
+    let classChartInstance = null;
+
+    function renderCharts() {
+        window.renderCharts = renderCharts;
+        const theme = getChartThemeColors();
+
+        // 1. Trend Chart (Line Chart)
+        const trendCanvas = document.getElementById("trendChart");
+        if (trendCanvas) {
+            const ctx = trendCanvas.getContext("2d");
+            const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+            gradient.addColorStop(0, "rgba(37, 99, 235, 0.35)");
+            gradient.addColorStop(1, "rgba(37, 99, 235, 0.00)");
+
+            if (trendChartInstance) {
+                trendChartInstance.destroy();
+            }
+
+            trendChartInstance = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: trendLabels,
+                    datasets: [{
+                        label: "Present Students",
+                        data: trendCounts,
+                        borderColor: "#2563eb",
+                        borderWidth: 3,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.38,
+                        pointBackgroundColor: "#2563eb",
+                        pointBorderColor: "#ffffff",
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: "#1d4ed8",
+                        pointHoverBorderColor: "#ffffff"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: theme.tooltipBg,
+                            titleColor: theme.tooltipText,
+                            bodyColor: theme.tooltipText,
+                            padding: 11,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Turnout: ${context.parsed.y} Student${context.parsed.y === 1 ? '' : 's'}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: theme.gridColor, drawBorder: false },
+                            ticks: { color: theme.textColor, font: { weight: "600", size: 12 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: theme.gridColor, drawBorder: false },
+                            ticks: {
+                                color: theme.textColor,
+                                precision: 0,
+                                stepSize: 1,
+                                font: { weight: "600", size: 12 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Ratio Chart (Doughnut Chart)
+        const ratioCanvas = document.getElementById("ratioChart");
+        if (ratioCanvas) {
+            const ctx = ratioCanvas.getContext("2d");
+            if (ratioChartInstance) {
+                ratioChartInstance.destroy();
+            }
+
+            const hasStudents = totalStudentsCount > 0;
+            const dataValues = hasStudents ? [presentTodayCount, absentTodayCount] : [0, 1];
+            const dataColors = hasStudents ? ["#10b981", "#ef4444"] : ["#cbd5e1", "#e2e8f0"];
+            const dataLabels = hasStudents ? ["Present", "Absent"] : ["No Students Registered", ""];
+
+            ratioChartInstance = new Chart(ctx, {
+                type: "doughnut",
+                data: {
+                    labels: dataLabels,
+                    datasets: [{
+                        data: dataValues,
+                        backgroundColor: dataColors,
+                        borderWidth: 2,
+                        borderColor: document.documentElement.classList.contains("dark-theme") ? "#111827" : "#ffffff",
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: "70%",
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: {
+                                color: theme.textColor,
+                                font: { weight: "600", size: 12 },
+                                padding: 16,
+                                usePointStyle: true,
+                                pointStyle: "circle"
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: theme.tooltipBg,
+                            titleColor: theme.tooltipText,
+                            bodyColor: theme.tooltipText,
+                            padding: 11,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    if (!hasStudents) return "No data";
+                                    const val = context.parsed;
+                                    const pct = totalStudentsCount > 0 ? Math.round((val / totalStudentsCount) * 100) : 0;
+                                    return ` ${context.label}: ${val} (${pct}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 3. Class Chart (Bar Chart)
+        const classCanvas = document.getElementById("classChart");
+        if (classCanvas && classLabels && classLabels.length > 0) {
+            const ctx = classCanvas.getContext("2d");
+            if (classChartInstance) {
+                classChartInstance.destroy();
+            }
+
+            classChartInstance = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: classLabels,
+                    datasets: [{
+                        label: "Attendance Turnout (%)",
+                        data: classRates,
+                        backgroundColor: "rgba(99, 102, 241, 0.85)",
+                        borderColor: "#6366f1",
+                        borderWidth: 1.5,
+                        borderRadius: 8,
+                        hoverBackgroundColor: "#4f46e5"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: theme.tooltipBg,
+                            titleColor: theme.tooltipText,
+                            bodyColor: theme.tooltipText,
+                            padding: 11,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Turnout: ${context.parsed.y}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: theme.textColor, font: { weight: "600", size: 12 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: theme.gridColor, drawBorder: false },
+                            ticks: {
+                                color: theme.textColor,
+                                stepSize: 20,
+                                font: { weight: "600", size: 12 },
+                                callback: function(val) { return val + "%"; }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // Render charts on DOM load
+    document.addEventListener("DOMContentLoaded", function() {
+        renderCharts();
+    });
+
+    // In case DOMContentLoaded already fired
+    if (document.readyState === "complete" || document.readyState === "interactive") {
+        setTimeout(renderCharts, 50);
+    }
+</script>
 
 </body>
 

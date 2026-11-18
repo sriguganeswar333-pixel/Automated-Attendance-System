@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Schedule Setup - Automated Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            padding: 30px 20px;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 740px;
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 20px;
+            padding: 36px 40px;
+            box-shadow: var(--shadow) !important;
+            color: var(--text-primary) !important;
+            transition: background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-theme-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .top-theme-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .subtitle {
+            color: var(--text-secondary) !important;
+            margin-bottom: 26px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section h2 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary) !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* =========================
+           ATTENDANCE MODE
+           ========================= */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .mode {
+            display: block;
+            border: 2px solid var(--border-color) !important;
+            border-radius: 14px;
+            background: var(--input-bg) !important;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .mode:hover {
+            border-color: var(--primary-color) !important;
+            background: var(--card-bg) !important;
+            transform: translateY(-2px);
+        }
+
+        .mode input[type="radio"] {
+            margin-right: 10px;
+            accent-color: var(--primary-color);
+            transform: scale(1.15);
+        }
+
+        .mode strong {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-primary) !important;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .mode span {
+            color: var(--text-secondary) !important;
+            font-size: 13px;
+            line-height: 1.5;
+            display: block;
+        }
+
+        /* =========================
+           TIME FIELDS
+           ========================= */
+        .time-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label.field-label {
+            display: block;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-primary) !important;
+        }
+
+        input[type="time"] {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 12px;
+            font-size: 15px;
+            background: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="time"]:focus {
+            border-color: var(--primary-color) !important;
+        }
+
+        input[type="time"]:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        /* =========================
+           WORKING DAYS
+           ========================= */
+        .days {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .day {
+            border: 1px solid var(--border-color) !important;
+            border-radius: 11px;
+            padding: 12px 14px;
+            background: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .day:hover {
+            background: var(--card-bg) !important;
+            border-color: var(--primary-color) !important;
+            transform: translateY(-1px);
+        }
+
+        .day input[type="checkbox"] {
+            accent-color: var(--primary-color);
+            transform: scale(1.15);
+        }
+
+        /* =========================
+           ERROR
+           ========================= */
+        .error {
+            background: rgba(220, 38, 38, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(220, 38, 38, 0.25);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* =========================
+           BUTTONS
+           ========================= */
+        .actions {
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            height: 50px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary-color) !important;
+            color: #ffffff !important;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+        }
+
+        button[type="submit"]:hover {
+            background: var(--primary-hover) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+        }
+
+        .back-dashboard-btn {
+            width: 100%;
+            height: 46px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .back-dashboard-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .note {
+            margin-top: 14px;
+            color: var(--text-secondary) !important;
+            font-size: 13px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* =========================
+           RESPONSIVE
+           ========================= */
+        @media (max-width: 650px) {
+            .card {
+                padding: 24px 20px;
+            }
+
+            .mode-grid,
+            .time-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .days {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <!-- TITLE & TOP ACTIONS -->
+        <div class="header-top">
+            <h1>⚙️ Attendance Schedule Setup</h1>
+            <button type="button" id="themeToggle" class="top-theme-btn theme-switch-btn" title="Toggle Light / Dark Mode">
+                <span class="sidebar-icon theme-icon">🌙</span>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+        </div>
+
+        <p class="subtitle">
+            Configure your attendance operating hours and working days. These rules determine when the AI scanner is automatically active.
+        </p>
+
+        <!-- ERROR MESSAGE -->
+        {% if error %}
+        <div class="error">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+
+        <!-- FORM -->
+        <form method="POST">
+
+            <!-- 1. ATTENDANCE MODE -->
+            <div class="section">
+                <h2>1. Attendance Operating Mode</h2>
+
+                <div class="mode-grid">
+                    <!-- FULL TIME -->
+                    <label class="mode">
+                        <input
+                            type="radio"
+                            name="attendance_mode"
+                            value="full_time"
+                            {% if settings["attendance_mode"] == "full_time" %}
+                                checked
+                            {% endif %}
+                            onchange="toggleTimeFields()"
+                        >
+                        <strong>Full-Time Attendance</strong>
+                        <span>Attendance can be marked freely anytime throughout the entire working day (24 Hours).</span>
+                    </label>
+
+                    <!-- CUSTOM TIME -->
+                    <label class="mode">
+                        <input
+                            type="radio"
+                            name="attendance_mode"
+                            value="custom"
+                            {% if settings["attendance_mode"] == "custom" %}
+                                checked
+                            {% endif %}
+                            onchange="toggleTimeFields()"
+                        >
+                        <strong>Custom Time Window</strong>
+                        <span>Specify a designated start and end time window during which attendance is permitted.</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 2. ATTENDANCE TIME -->
+            <div class="section" id="timeSection">
+                <h2>2. Operating Hours (For Custom Mode)</h2>
+
+                <div class="time-grid">
+                    <!-- START TIME -->
+                    <div>
+                        <label class="field-label" for="start_time">
+                            🕒 Start Time
+                        </label>
+                        <input
+                            type="time"
+                            id="start_time"
+                            name="start_time"
+                            value="{{ settings['start_time'] }}"
+                        >
+                    </div>
+
+                    <!-- END TIME -->
+                    <div>
+                        <label class="field-label" for="end_time">
+                            🕒 End Time
+                        </label>
+                        <input
+                            type="time"
+                            id="end_time"
+                            name="end_time"
+                            value="{{ settings['end_time'] }}"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. WORKING DAYS -->
+            <div class="section">
+                <h2>3. Active Working Days</h2>
+
+                <div class="days">
+                    {% for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] %}
+                    <label class="day">
+                        <input
+                            type="checkbox"
+                            name="working_days"
+                            value="{{ day }}"
+                            {% if day in selected_days %}
+                                checked
+                            {% endif %}
+                        >
+                        {{ day }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="actions">
+                <button type="submit">
+                    💾 Save Attendance Schedule
+                </button>
+                <a href="{{ url_for('dashboard') }}" class="back-dashboard-btn">
+                    ← Back to Dashboard
+                </a>
+            </div>
+
+            <p class="note">
+                Your attendance schedule is linked to your account. You can modify these settings anytime from the Attendance Schedule menu.
+            </p>
+
+        </form>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        function toggleTimeFields() {
+            const customModeEl = document.querySelector('input[name="attendance_mode"][value="custom"]');
+            const customMode = customModeEl ? customModeEl.checked : false;
+
+            const timeSection = document.getElementById("timeSection");
+            const startTime = document.getElementById("start_time");
+            const endTime = document.getElementById("end_time");
+
+            if (timeSection && startTime && endTime) {
+                if (customMode) {
+                    timeSection.style.opacity = "1";
+                    startTime.disabled = false;
+                    endTime.disabled = false;
+                } else {
+                    timeSection.style.opacity = "0.5";
+                    startTime.disabled = true;
+                    endTime.disabled = true;
+                }
+            }
+        }
+
+        toggleTimeFields();
+    </script>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+
+</body>
+
+</html>

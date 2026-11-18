@@ -2,798 +2,505 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Add Student</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student - Automated Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
 
     <style>
-
         * {
             box-sizing: border-box;
         }
 
         body {
-
             margin: 0;
+            padding: 0;
+            padding-left: 286px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: Arial, Helvetica, sans-serif;
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
 
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
+        .main-content {
+            padding: 35px 40px;
             min-height: 100vh;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #eef2ff,
-                    #dbeafe,
-                    #f8fafc
-                );
-
-            color: #1f2937;
-
         }
 
-
-        /* =====================================
-           PAGE
-        ===================================== */
-
-        .page {
-
-            min-height: 100vh;
-
-            display: flex;
-
-            flex-direction: column;
-
+        .page-header {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 26px 30px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            transition: background 0.25s ease, border-color 0.25s ease;
         }
 
-
-        /* =====================================
-           HEADER
-        ===================================== */
-
-        .header {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #1e3a8a,
-                    #2563eb
-                );
-
-            color: white;
-
-            padding: 28px 7%;
-
-            box-shadow:
-                0 5px 20px
-                rgba(0,0,0,0.15);
-
-        }
-
-
-        .header h1 {
-
+        .page-header h1 {
             margin: 0;
-
-            font-size: 32px;
-
+            font-size: 28px;
+            color: var(--text-primary);
+            font-weight: 700;
         }
 
-
-        .header p {
-
-            margin: 8px 0 0;
-
-            opacity: 0.9;
-
-            font-size: 16px;
-
+        .page-header p {
+            margin: 6px 0 0;
+            color: var(--text-secondary);
+            font-size: 15px;
         }
 
-
-        /* =====================================
-           MAIN CONTENT
-        ===================================== */
-
-        .main {
-
-            flex: 1;
-
-            width: 90%;
-
-            max-width: 1200px;
-
-            margin: 45px auto;
-
+        .form-layout {
             display: grid;
-
-            grid-template-columns:
-                1fr 1.5fr;
-
-            gap: 35px;
-
-            align-items: stretch;
-
+            grid-template-columns: 1fr 1.6fr;
+            gap: 25px;
+            align-items: start;
         }
 
-
-        /* =====================================
-           INFORMATION PANEL
-        ===================================== */
-
-        .info {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #1e3a8a,
-                    #2563eb
-                );
-
+        /* INFO CARD */
+        .info-card {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            border-radius: 18px;
+            padding: 32px 28px;
             color: white;
-
-            border-radius: 22px;
-
-            padding: 45px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            justify-content: center;
-
-            box-shadow:
-                0 12px 35px
-                rgba(30,58,138,0.25);
-
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.25);
         }
 
-
-        .info .icon {
-
-            font-size: 60px;
-
-            margin-bottom: 20px;
-
+        .info-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
         }
 
-
-        .info h2 {
-
-            font-size: 30px;
-
-            margin: 0 0 15px;
-
+        .info-card h2 {
+            margin: 0 0 10px;
+            font-size: 24px;
+            font-weight: 700;
         }
 
-
-        .info p {
-
-            line-height: 1.7;
-
-            opacity: 0.92;
-
-            font-size: 16px;
-
+        .info-card p {
+            margin: 0 0 24px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.85);
         }
-
 
         .steps {
-
-            margin-top: 25px;
-
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
         }
-
 
         .step {
-
             display: flex;
-
             align-items: center;
-
-            gap: 12px;
-
-            margin: 16px 0;
-
-            font-size: 15px;
-
+            gap: 14px;
+            font-size: 14px;
+            font-weight: 600;
         }
-
 
         .step-number {
-
             width: 32px;
-
             height: 32px;
-
             border-radius: 50%;
-
-            background: rgba(255,255,255,0.2);
-
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             font-weight: bold;
-
+            font-size: 13px;
         }
 
-
-        /* =====================================
-           FORM CARD
-        ===================================== */
-
+        /* FORM CARD */
         .form-card {
-
-            background: white;
-
-            border-radius: 22px;
-
-            padding: 45px;
-
-            box-shadow:
-                0 12px 35px
-                rgba(0,0,0,0.10);
-
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            transition: background 0.25s ease, border-color 0.25s ease;
         }
-
 
         .form-card h2 {
-
-            margin: 0;
-
-            font-size: 28px;
-
-            color: #111827;
-
+            margin: 0 0 6px;
+            font-size: 22px;
+            color: var(--text-primary);
+            font-weight: 700;
         }
-
 
         .form-card .subtitle {
-
-            color: #6b7280;
-
-            margin: 8px 0 30px;
-
+            margin: 0 0 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
         }
 
-
-        /* =====================================
-           FORM
-        ===================================== */
+        .error-box {
+            background: rgba(220, 38, 38, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(220, 38, 38, 0.25);
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
 
         .form-group {
-
-            margin-bottom: 24px;
-
+            margin-bottom: 20px;
         }
 
-
-        label {
-
+        .form-group label {
             display: block;
-
-            font-weight: bold;
-
-            margin-bottom: 9px;
-
-            color: #374151;
-
-            font-size: 15px;
-
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
-
-        input,
-        select {
-
+        .form-group input,
+        .form-group select {
             width: 100%;
-
-            padding: 15px 16px;
-
-            border: 1px solid #d1d5db;
-
-            border-radius: 10px;
-
-            font-size: 16px;
-
+            height: 48px;
+            padding: 0 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 15px;
             outline: none;
-
-            background: #f9fafb;
-
-            transition:
-                border 0.2s,
-                box-shadow 0.2s;
-
+            transition: all 0.2s ease;
         }
 
-
-        input:focus,
-        select:focus {
-
-            border-color: #2563eb;
-
-            background: white;
-
-            box-shadow:
-                0 0 0 3px
-                rgba(37,99,235,0.12);
-
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
-
-
-        /* =====================================
-           CLASS + SECTION
-        ===================================== */
 
         .row {
-
             display: grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
+            grid-template-columns: 1fr 1fr;
             gap: 18px;
-
         }
-
-
-        /* =====================================
-           BUTTONS
-        ===================================== */
 
         .buttons {
-
             display: flex;
-
-            gap: 15px;
-
-            margin-top: 30px;
-
+            gap: 14px;
+            margin-top: 28px;
         }
-
 
         .submit-btn {
-
             flex: 1;
-
-            border: none;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #2563eb,
-                    #1d4ed8
-                );
-
+            height: 48px;
+            background: var(--primary-color);
             color: white;
-
-            padding: 16px;
-
-            border-radius: 10px;
-
-            font-size: 16px;
-
-            font-weight: bold;
-
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-
-            transition:
-                transform 0.2s,
-                box-shadow 0.2s;
-
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
         }
-
 
         .submit-btn:hover {
-
+            background: var(--primary-hover);
             transform: translateY(-2px);
-
-            box-shadow:
-                0 8px 20px
-                rgba(37,99,235,0.25);
-
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
         }
-
 
         .cancel-btn {
-
-            padding: 16px 25px;
-
-            border-radius: 10px;
-
-            background: #f3f4f6;
-
-            color: #374151;
-
+            padding: 0 24px;
+            height: 48px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 12px;
             text-decoration: none;
-
-            font-weight: bold;
-
-            display: flex;
-
+            font-size: 14px;
+            font-weight: 700;
+            display: inline-flex;
             align-items: center;
-
             justify-content: center;
-
+            gap: 8px;
+            transition: all 0.2s ease;
         }
-
 
         .cancel-btn:hover {
-
-            background: #e5e7eb;
-
+            border-color: var(--primary-color);
+            color: var(--primary-color);
         }
-
-
-        /* =====================================
-           RESPONSIVE
-        ===================================== */
 
         @media (max-width: 900px) {
+            body {
+                padding-left: 0;
+            }
 
-            .main {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
 
+            .main-content {
+                padding: 20px;
+            }
+
+            .form-layout {
                 grid-template-columns: 1fr;
-
-            }
-
-            .info {
-
-                padding: 35px;
-
-            }
-
-        }
-
-
-        @media (max-width: 600px) {
-
-            .main {
-
-                width: 94%;
-
-                margin: 25px auto;
-
-            }
-
-            .form-card {
-
-                padding: 28px;
-
             }
 
             .row {
-
                 grid-template-columns: 1fr;
-
             }
-
-            .buttons {
-
-                flex-direction: column;
-
-            }
-
         }
-
     </style>
-
 </head>
-
 
 <body>
 
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+    <aside class="sidebar">
 
-<div class="page">
+        <div class="brand">
+            <h2>🎓 Attendance</h2>
+            <p>Smart Attendance Management</p>
+        </div>
 
+        <nav class="nav-menu">
+            <a href="{{ url_for('dashboard') }}" class="nav-link">
+                <span class="sidebar-icon">🏠</span>
+                <span>Dashboard</span>
+            </a>
 
-    <!-- =====================================
-         HEADER
-    ===================================== -->
+            <a href="{{ url_for('students') }}" class="nav-link">
+                <span class="sidebar-icon">👨‍🎓</span>
+                <span>Student Management</span>
+            </a>
 
-    <header class="header">
+            <a href="{{ url_for('add_student') }}" class="nav-link active">
+                <span class="sidebar-icon">➕</span>
+                <span>Add Student</span>
+            </a>
 
-        <h1>
-            🎓 Automated Attendance System
-        </h1>
+            <a href="{{ url_for('take_attendance') }}" class="nav-link">
+                <span class="sidebar-icon">📷</span>
+                <span>Take Attendance</span>
+            </a>
 
-        <p>
-            Student Management • Registration
-        </p>
+            <a href="{{ url_for('attendance_reports') }}" class="nav-link">
+                <span class="sidebar-icon">📊</span>
+                <span>Attendance Reports</span>
+            </a>
 
-    </header>
+            <a href="{{ url_for('attendance_setup') }}" class="nav-link">
+                <span class="sidebar-icon">⚙️</span>
+                <span>Attendance Schedule</span>
+            </a>
+        </nav>
 
+        <div class="sidebar-bottom">
+            <button type="button" id="themeToggle" class="theme-switch-btn dark-mode-button" title="Toggle light / dark mode">
+                <span class="sidebar-icon theme-icon">🌙</span>
+                <span class="theme-text">Dark Mode</span>
+            </button>
 
-    <!-- =====================================
-         MAIN
-    ===================================== -->
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <span class="sidebar-icon">🚪</span>
+                <span>Logout</span>
+            </a>
+        </div>
 
-    <main class="main">
+    </aside>
 
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+    <main class="main-content">
 
-        <!-- INFORMATION -->
-
-        <section class="info">
-
-            <div class="icon">
-                👨‍🎓
-            </div>
-
-            <h2>
-                Add New Student
-            </h2>
-
-            <p>
-                Register student information before
-                completing face registration for
-                automated attendance.
-            </p>
-
-
-            <div class="steps">
-
-
-                <div class="step">
-
-                    <div class="step-number">
-                        1
-                    </div>
-
-                    Enter student name
-
-                </div>
-
-
-                <div class="step">
-
-                    <div class="step-number">
-                        2
-                    </div>
-
-                    Select class and section
-
-                </div>
-
-
-                <div class="step">
-
-                    <div class="step-number">
-                        3
-                    </div>
-
-                    Add the student
-
-                </div>
-
-
-                <div class="step">
-
-                    <div class="step-number">
-                        4
-                    </div>
-
-                    Register student's face
-
-                </div>
-
-
-            </div>
-
+        <!-- PAGE HEADER -->
+        <section class="page-header">
+            <h1>➕ Add Student</h1>
+            <p>Register a student profile before completing face recognition capture.</p>
         </section>
 
+        <div class="form-layout">
 
-        <!-- =================================
-             FORM
-        ================================= -->
-
-        <section class="form-card">
-
-
-            <h2>
-                Student Details
-            </h2>
-
-            <p class="subtitle">
-                Enter the student's academic information.
-            </p>
-
-
-            <form
-                method="POST"
-                action="{{ url_for('add_student') }}"
-            >
-
-
-                <!-- NAME -->
-
-                <div class="form-group">
-
-                    <label for="name">
-
-                        👤 Student Name
-
-                    </label>
-
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Enter student's full name"
-                        required
-                    >
-
+            <!-- INSTRUCTIONS CARD -->
+            <section class="info-card">
+                <div class="info-icon">👨‍🎓</div>
+                {% if institution_type == 'college' %}
+                <h2>College Student Registration</h2>
+                <p>Register student academic credentials including Department, Year, Section, and Register Number for university automated attendance.</p>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <span>Enter student's full name</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <span>Enter Register Number (Reg No)</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <span>Select Department, Year & Section</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <span>Complete burst face registration</span>
+                    </div>
                 </div>
+                {% else %}
+                <h2>School Student Registration</h2>
+                <p>Register student academic information including Roll Number, Class (Grade 1-12), and Section for school automated attendance.</p>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <span>Enter student's full name</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <span>Enter Roll Number</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <span>Select Class and Section</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <span>Complete burst face registration</span>
+                    </div>
+                </div>
+                {% endif %}
+            </section>
 
+            <!-- FORM CARD -->
+            <section class="form-card">
+                <h2>Student Details</h2>
+                <p class="subtitle">Enter the student's academic credentials.</p>
 
-                <!-- CLASS + SECTION -->
+                {% if error %}
+                <div class="error-box">
+                    ⚠️ {{ error }}
+                </div>
+                {% endif %}
 
-                <div class="row">
+                <form method="POST" action="{{ url_for('add_student') }}">
 
-
+                    <!-- STUDENT NAME -->
                     <div class="form-group">
-
-                        <label for="class_name">
-
-                            🏫 Class
-
-                        </label>
-
-                        <select
-                            id="class_name"
-                            name="class_name"
-                            required
-                        >
-
-                            <option value="">
-                                Select Class
-                            </option>
-
-                            <option value="1">
-                                Class 1
-                            </option>
-
-                            <option value="2">
-                                Class 2
-                            </option>
-
-                            <option value="3">
-                                Class 3
-                            </option>
-
-                            <option value="4">
-                                Class 4
-                            </option>
-
-                            <option value="5">
-                                Class 5
-                            </option>
-
-                            <option value="6">
-                                Class 6
-                            </option>
-
-                            <option value="7">
-                                Class 7
-                            </option>
-
-                            <option value="8">
-                                Class 8
-                            </option>
-
-                            <option value="9">
-                                Class 9
-                            </option>
-
-                            <option value="10">
-                                Class 10
-                            </option>
-
-                            <option value="11">
-                                Class 11
-                            </option>
-
-                            <option value="12">
-                                Class 12
-                            </option>
-
-                        </select>
-
+                        <label for="name">👤 Student Full Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter student's full name" required autofocus>
                     </div>
 
-
+                    {% if institution_type == 'college' %}
+                    <!-- COLLEGE FIELDS: REG NUMBER, DEPT, YEAR, SECTION -->
                     <div class="form-group">
-
-                        <label for="section">
-
-                            📚 Section
-
-                        </label>
-
-                        <select
-                            id="section"
-                            name="section"
-                            required
-                        >
-
-                            <option value="">
-                                Select Section
-                            </option>
-
-                            <option value="A">
-                                Section A
-                            </option>
-
-                            <option value="B">
-                                Section B
-                            </option>
-
-                            <option value="C">
-                                Section C
-                            </option>
-
-                            <option value="D">
-                                Section D
-                            </option>
-
-                        </select>
-
+                        <label for="reg_number">🆔 Register Number (Reg No)</label>
+                        <input type="text" id="reg_number" name="reg_number" placeholder="Example: 210101001" required>
                     </div>
 
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="department">🏛️ Department (Dept)</label>
+                            <select id="department" name="department" required>
+                                <option value="">Select Department</option>
+                                <option value="AI & DS">AI & DS (Artificial Intelligence & Data Science)</option>
+                                <option value="CSE">CSE (Computer Science & Engineering)</option>
+                                <option value="IT">IT (Information Technology)</option>
+                                <option value="ECE">ECE (Electronics & Communication Engineering)</option>
+                                <option value="EEE">EEE (Electrical & Electronics Engineering)</option>
+                                <option value="MECH">MECH (Mechanical Engineering)</option>
+                                <option value="CIVIL">CIVIL (Civil Engineering)</option>
+                                <option value="CSBS">CSBS (Computer Science & Business Systems)</option>
+                                <option value="Cyber Security">Cyber Security</option>
+                                <option value="MBA">MBA (Master of Business Administration)</option>
+                                <option value="MCA">MCA (Master of Computer Applications)</option>
+                                <option value="Commerce">Commerce / B.Com / BBA</option>
+                                <option value="Science">Science (Physics, Chemistry, Maths)</option>
+                            </select>
+                        </div>
 
-                </div>
+                        <div class="form-group">
+                            <label for="year">📅 Year</label>
+                            <select id="year" name="year" required>
+                                <option value="">Select Year</option>
+                                <option value="1st Year">1st Year</option>
+                                <option value="2nd Year">2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
+                                <option value="4th Year">4th Year</option>
+                            </select>
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <label for="section">📚 Section</label>
+                        <select id="section" name="section" required>
+                            <option value="">Select Section</option>
+                            <option value="A">Section A</option>
+                            <option value="B">Section B</option>
+                            <option value="C">Section C</option>
+                            <option value="D">Section D</option>
+                        </select>
+                    </div>
 
-                <!-- BUTTONS -->
+                    {% else %}
+                    <!-- SCHOOL FIELDS: ROLL NUMBER, CLASS 1-12, SECTION -->
+                    <div class="form-group">
+                        <label for="roll_number">🔢 Roll Number</label>
+                        <input type="text" id="roll_number" name="roll_number" placeholder="Example: 101" required>
+                    </div>
 
-                <div class="buttons">
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="class_name">🏫 Class</label>
+                            <select id="class_name" name="class_name" required>
+                                <option value="">Select Class</option>
+                                {% for c in range(1, 13) %}
+                                <option value="Class {{ c }}">Class {{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
+                        <div class="form-group">
+                            <label for="section">📚 Section</label>
+                            <select id="section" name="section" required>
+                                <option value="">Select Section</option>
+                                <option value="A">Section A</option>
+                                <option value="B">Section B</option>
+                                <option value="C">Section C</option>
+                                <option value="D">Section D</option>
+                            </select>
+                        </div>
+                    </div>
+                    {% endif %}
 
-                    <a
-                        href="{{ url_for('students') }}"
-                        class="cancel-btn"
-                    >
+                    <div class="buttons">
+                        <a href="{{ url_for('students') }}" class="cancel-btn">
+                            ← Cancel
+                        </a>
+                        <button type="submit" class="submit-btn">
+                            ➕ Register & Next: Face Capture
+                        </button>
+                    </div>
 
-                        ← Cancel
+                </form>
+            </section>
 
-                    </a>
+        </div>
 
-
-                    <button
-                        type="submit"
-                        class="submit-btn"
-                    >
-
-                        ➕ Add Student
-
-                    </button>
-
-
-                </div>
-
-
-            </form>
-
-
-        </section>
-
+        <a href="{{ url_for('dashboard') }}" class="cancel-btn" style="margin-top: 25px;">
+            ← Back to Dashboard
+        </a>
 
     </main>
 
-
-</div>
-
-
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </body>
-
 </html>

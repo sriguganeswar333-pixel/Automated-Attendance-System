@@ -412,3 +412,118 @@ th {
     margin-top: 20px;
     font-weight: bold;
 }
+
+/* Bottom-right Logout Button */
+.logout-button {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 12px 20px;
+
+    background: #dc2626;
+    color: white;
+
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+
+    border-radius: 10px;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+
+    transition: all 0.3s ease;
+
+    z-index: 9999;
+}
+
+.logout-button:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+}
+
+.logout-button span {
+    font-size: 18px;
+}
+
+/* ================================
+   INSTITUTION TYPE
+================================ */
+
+.institution-section {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+
+.institution-section h3 {
+    text-align: left;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+}
+
+.institution-options {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.institution-option {
+    flex: 1;
+    position: relative;
+}
+
+.institution-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.institution-option label {
+    width: 100%;
+    min-height: 90px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border: 2px solid #d1d9e6;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+    transition: all 0.25s ease;
+}
+
+.institution-option label:hover {
+    border-color: #2864e8;
+    transform: translateY(-2px);
+}
+
+.institution-option input:checked + label {
+    border-color: #2864e8;
+    background: #eef4ff;
+    box-shadow: 0 4px 12px rgba(40, 100, 232, 0.15);
+}
+
+.institution-icon {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.institution-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: 0.5px;
+}

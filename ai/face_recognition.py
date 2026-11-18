@@ -1,25 +1,37 @@
 import cv2
 import os
+import sys
 import numpy as np
 
+if hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 # ==================================================
-# PATHS
+# PATHS (Robust Absolute Resolution)
 # ==================================================
+
+BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))
+)
 
 FACE_DIRECTORY = os.path.join(
+    BASE_DIR,
     "data",
     "faces"
 )
 
 MODEL_PATH = os.path.join(
+    BASE_DIR,
     "data",
     "face_model.yml"
 )
 
 
 # ==================================================
-# FACE DETECTOR
+# FACE DETECTOR & CLAHE EQUALIZER
 # ==================================================
 
 FACE_CASCADE = cv2.CascadeClassifier(
@@ -27,129 +39,86 @@ FACE_CASCADE = cv2.CascadeClassifier(
     "haarcascade_frontalface_default.xml"
 )
 
+CLAHE = cv2.createCLAHE(
+    clipLimit=2.0,
+    tileGridSize=(8, 8)
+)
+
+
+def preprocess_face(face_gray):
+    """
+    Standardize face dimensions to 200x200 and apply
+    CLAHE lighting equalization for optimal LBPH texture extraction.
+    """
+    resized = cv2.resize(face_gray, (200, 200))
+    equalized = CLAHE.apply(resized)
+    return equalized
+
 
 # ==================================================
 # PREPARE TRAINING DATA
 # ==================================================
 
 def prepare_training_data():
-
     faces = []
     labels = []
 
     if not os.path.exists(FACE_DIRECTORY):
-
-        print("❌ Face directory not found.")
-
+        print("❌ Face directory not found:", FACE_DIRECTORY)
         return faces, labels
-
 
     files = os.listdir(FACE_DIRECTORY)
 
-    for filename in files:
-
+    for filename in sorted(files):
         # Only image files
-
-        if not filename.lower().endswith(
-            (".jpg", ".jpeg", ".png")
-        ):
+        if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
             continue
 
-
-        # Only student images
-
+        # Only student images (student_1.jpg, student_1_1.jpg, etc.)
         if not filename.startswith("student_"):
             continue
 
-
-        # --------------------------------------------------
-        # GET STUDENT ID FROM FILENAME
-        # student_1.jpg → 1
-        # student_2.jpg → 2
-        # --------------------------------------------------
-
         try:
-
-            student_id = int(
-                os.path.splitext(filename)[0]
-                .split("_")[1]
-            )
-
+            parts = os.path.splitext(filename)[0].split("_")
+            student_id = int(parts[1])
         except (ValueError, IndexError):
-
-            print(
-                f"⚠️ Invalid student image: {filename}"
-            )
-
+            print(f"⚠️ Invalid student image format: {filename}")
             continue
 
-
-        image_path = os.path.join(
-            FACE_DIRECTORY,
-            filename
-        )
-
-
-        # --------------------------------------------------
-        # READ IMAGE
-        # --------------------------------------------------
-
-        image = cv2.imread(
-            image_path,
-            cv2.IMREAD_GRAYSCALE
-        )
-
+        image_path = os.path.join(FACE_DIRECTORY, filename)
+        image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
         if image is None:
-
-            print(
-                f"⚠️ Could not read: {filename}"
-            )
-
+            print(f"⚠️ Could not read: {filename}")
             continue
-
-
-        # --------------------------------------------------
-        # DETECT FACE
-        # --------------------------------------------------
 
         detected_faces = FACE_CASCADE.detectMultiScale(
             image,
             scaleFactor=1.1,
-            minNeighbors=5,
-            minSize=(80, 80)
+            minNeighbors=4,
+            minSize=(60, 60)
         )
-
 
         if len(detected_faces) == 0:
-
-            print(
-                f"⚠️ No face found in {filename}"
-            )
-
+            # Fallback: if the image was already a cropped/preprocessed face
+            h, w = image.shape
+            if h >= 50 and w >= 50:
+                enhanced = preprocess_face(image)
+                faces.append(enhanced)
+                labels.append(student_id)
+                print(f"✅ Loaded cropped face: {filename} → Student ID {student_id}")
+            else:
+                print(f"⚠️ No face found in {filename}")
             continue
 
+        # Use the largest detected face in frame
+        x, y, w, h = max(detected_faces, key=lambda b: b[2] * b[3])
+        face_roi = image[y:y + h, x:x + w]
+        enhanced = preprocess_face(face_roi)
+        faces.append(enhanced)
+        labels.append(student_id)
 
-        # --------------------------------------------------
-        # ADD FACES
-        # --------------------------------------------------
-
-        for (x, y, w, h) in detected_faces:
-
-            face = image[
-                y:y + h,
-                x:x + w
-            ]
-
-            faces.append(face)
-
-            labels.append(student_id)
-
-
-        print(
-            f"✅ Loaded {filename} → Student ID {student_id}"
-        )
-
+        print(f"✅ Loaded {filename} → Student ID {student_id}")
 
     return faces, labels
 
@@ -159,72 +128,32 @@ def prepare_training_data():
 # ==================================================
 
 def train_model():
-
     print()
     print("======================================")
     print("      TRAINING FACE MODEL")
     print("======================================")
     print()
 
-
     faces, labels = prepare_training_data()
 
-
     if len(faces) == 0:
-
-        print(
-            "❌ No valid face images found."
-        )
-
+        print("❌ No valid face images found.")
         return False
 
-
-    # --------------------------------------------------
-    # SHOW TRAINING INFORMATION
-    # --------------------------------------------------
-
-    unique_ids = sorted(
-        set(labels)
-    )
-
+    unique_ids = sorted(set(labels))
 
     print()
-    print(
-        f"👥 Students detected: {len(unique_ids)}"
-    )
-
-    print(
-        f"🆔 Student IDs: {unique_ids}"
-    )
-
-    print(
-        f"📷 Training faces: {len(faces)}"
-    )
-
+    print(f"👥 Students detected: {len(unique_ids)}")
+    print(f"🆔 Student IDs: {unique_ids}")
+    print(f"📷 Training faces: {len(faces)}")
     print()
-
 
     if len(unique_ids) < 2:
-
-        print(
-            "⚠️ WARNING:"
-        )
-
-        print(
-            "Only one student is currently registered."
-        )
-
-        print(
-            "Register more students for better recognition."
-        )
-
+        print("⚠️ NOTE: Only one student is currently registered.")
+        print("Register more students for broader multi-class classification.")
         print()
 
-
-    # --------------------------------------------------
-    # CREATE LBPH RECOGNIZER
-    # --------------------------------------------------
-
+    # Create LBPH Face Recognizer with fine-grained radius and grid
     recognizer = cv2.face.LBPHFaceRecognizer_create(
         radius=1,
         neighbors=8,
@@ -232,49 +161,17 @@ def train_model():
         grid_y=8
     )
 
-
-    # --------------------------------------------------
-    # TRAIN
-    # --------------------------------------------------
-
     recognizer.train(
         faces,
-        np.array(
-            labels,
-            dtype=np.int32
-        )
+        np.array(labels, dtype=np.int32)
     )
 
+    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    recognizer.save(MODEL_PATH)
 
-    # --------------------------------------------------
-    # CREATE DATA DIRECTORY
-    # --------------------------------------------------
-
-    os.makedirs(
-        "data",
-        exist_ok=True
-    )
-
-
-    # --------------------------------------------------
-    # SAVE MODEL
-    # --------------------------------------------------
-
-    recognizer.save(
-        MODEL_PATH
-    )
-
-
-    print(
-        "🔥 Face model trained successfully!"
-    )
-
-    print(
-        f"📁 Model saved: {MODEL_PATH}"
-    )
-
+    print("🔥 Face model trained successfully!")
+    print(f"📁 Model saved: {MODEL_PATH}")
     print()
-
 
     return True
 
@@ -284,40 +181,14 @@ def train_model():
 # ==================================================
 
 def recognize_face(image_path):
-
-    if not os.path.exists(
-        MODEL_PATH
-    ):
-
-        print(
-            "❌ Face model not found."
-        )
-
+    if not os.path.exists(MODEL_PATH):
+        print("❌ Face model not found at:", MODEL_PATH)
         return None
 
-
-    # --------------------------------------------------
-    # READ IMAGE
-    # --------------------------------------------------
-
-    image = cv2.imread(
-        image_path,
-        cv2.IMREAD_GRAYSCALE
-    )
-
-
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     if image is None:
-
-        print(
-            "❌ Could not read image."
-        )
-
+        print("❌ Could not read image:", image_path)
         return None
-
-
-    # --------------------------------------------------
-    # CREATE RECOGNIZER
-    # --------------------------------------------------
 
     recognizer = cv2.face.LBPHFaceRecognizer_create(
         radius=1,
@@ -325,83 +196,39 @@ def recognize_face(image_path):
         grid_x=8,
         grid_y=8
     )
-
-
-    recognizer.read(
-        MODEL_PATH
-    )
-
-
-    # --------------------------------------------------
-    # DETECT FACE
-    # --------------------------------------------------
+    recognizer.read(MODEL_PATH)
 
     detected_faces = FACE_CASCADE.detectMultiScale(
         image,
         scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(80, 80)
+        minNeighbors=4,
+        minSize=(60, 60)
     )
 
-
     if len(detected_faces) == 0:
-
-        print(
-            "❌ No face detected."
-        )
-
-        return None
-
-
-    # --------------------------------------------------
-    # RECOGNIZE
-    # --------------------------------------------------
-
-    for (x, y, w, h) in detected_faces:
-
-        face = image[
-            y:y + h,
-            x:x + w
-        ]
-
-
-        student_id, confidence = recognizer.predict(
-            face
-        )
-
-
-        print()
-        print(
-            f"🔍 Predicted Student ID: {student_id}"
-        )
-
-        print(
-            f"🔍 LBPH Distance: {confidence:.2f}"
-        )
-
-
-        # ==================================================
-        # IMPORTANT
-        # LOWER = BETTER
-        # ==================================================
-
-        # Strict threshold
-        if confidence < 55:
-
-            print(
-                "✅ Face recognized."
-            )
-
-            return student_id
-
-
+        h, w = image.shape
+        if h >= 50 and w >= 50:
+            detected_faces = [(0, 0, w, h)]
         else:
-
-            print(
-                "❌ Face does not match registered student."
-            )
-
+            print("❌ No face detected.")
             return None
 
+    for (x, y, w, h) in detected_faces:
+        face_roi = image[y:y + h, x:x + w]
+        enhanced = preprocess_face(face_roi)
+
+        student_id, confidence = recognizer.predict(enhanced)
+
+        print()
+        print(f"🔍 Predicted Student ID: {student_id}")
+        print(f"🔍 LBPH Distance: {confidence:.2f}")
+
+        # In LBPH: lower confidence distance means higher similarity
+        if confidence < 70:
+            print("✅ Face recognized!")
+            return student_id
+        else:
+            print("❌ Face distance too high (Unrecognized student).")
+            return None
 
     return None

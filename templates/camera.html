@@ -4,285 +4,608 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Face Registration</title>
+    <title>AI Face Registration | Automated Attendance</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            text-align: center;
-            padding: 30px;
+            background: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px 15px;
         }
 
         .container {
-            width: 700px;
-            max-width: 90%;
-            margin: auto;
-            background: white;
+            width: 820px;
+            max-width: 100%;
+            background: #1e293b;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45);
+            border: 1px solid #334155;
+            text-align: center;
         }
 
-        h1 {
-            color: #333;
+        .header h1 {
+            font-size: 26px;
+            color: #38bdf8;
+            margin-bottom: 6px;
         }
 
-        .student-info {
-            background: #eeeeee;
-            padding: 15px;
+        .header p {
+            color: #94a3b8;
+            font-size: 14px;
             margin-bottom: 20px;
-            border-radius: 10px;
+        }
+
+        /* STUDENT INFO CARD */
+        .student-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 14px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 22px;
+            text-align: left;
+        }
+
+        .student-item span {
+            display: block;
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .student-item strong {
+            font-size: 16px;
+            color: #f1f5f9;
+        }
+
+        /* CAMERA VIEWPORT */
+        .camera-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 380px;
+            margin: 0 auto 20px;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 3px solid #334155;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.15s ease;
+        }
+
+        .camera-wrapper.snapping {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.6) !important;
         }
 
         video {
-            width: 600px;
-            max-width: 100%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror view */
+        }
+
+        /* OVAL FACE GUIDE */
+        .face-guide {
+            position: absolute;
+            width: 200px;
+            height: 260px;
+            border: 2px dashed rgba(56, 189, 248, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .guide-text {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 4px 10px;
+            border-radius: 6px;
+            margin-top: 190px;
+        }
+
+        /* COUNTDOWN OVERLAY */
+        #countdownOverlay {
+            position: absolute;
+            font-size: 85px;
+            font-weight: 900;
+            color: #38bdf8;
+            text-shadow: 0 0 30px rgba(56, 189, 248, 0.8);
+            display: none;
+            z-index: 10;
+        }
+
+        /* PROGRESS SECTION */
+        .progress-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .sample-counter {
+            background: #0284c7;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .prompt-text {
+            font-size: 15px;
+            font-weight: bold;
+            color: #38bdf8;
+            margin-bottom: 10px;
+            min-height: 22px;
+            transition: color 0.2s;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background: #334155;
             border-radius: 10px;
-            border: 4px solid #333;
-            background: black;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0284c7, #22c55e);
+            border-radius: 10px;
+            transition: width 0.15s ease;
+        }
+
+        /* CONTROLS */
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 15px;
         }
 
         button {
-            padding: 12px 20px;
-            margin: 10px 5px;
+            padding: 13px 22px;
             border: none;
-            border-radius: 7px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 16px;
-        }
-
-        #startCamera {
-            background: #007bff;
-            color: white;
-        }
-
-        #capture {
-            background: #28a745;
-            color: white;
-        }
-
-        #back {
-            background: #6c757d;
-            color: white;
-        }
-
-        #message {
-            margin-top: 20px;
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        #startCameraBtn {
+            background: #2563eb;
+            color: white;
+        }
+
+        #startCameraBtn:hover:not(:disabled) {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        #autoCaptureBtn {
+            background: #16a34a;
+            color: white;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.35);
+        }
+
+        #autoCaptureBtn:hover:not(:disabled) {
+            background: #15803d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.5);
+        }
+
+        #singleCaptureBtn {
+            background: #475569;
+            color: white;
+        }
+
+        #singleCaptureBtn:hover:not(:disabled) {
+            background: #334155;
+        }
+
+        #backBtn {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid #475569;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+        #backBtn:hover {
+            background: #334155;
+            color: white;
+        }
+
+        /* STATUS MESSAGE */
+        #statusMessage {
+            font-size: 15px;
+            font-weight: bold;
+            min-height: 24px;
+            margin-top: 10px;
+        }
+
+        .msg-success {
+            color: #4ade80;
+        }
+
+        .msg-error {
+            color: #f87171;
+        }
+
+        .msg-info {
+            color: #38bdf8;
         }
 
         canvas {
             display: none;
         }
     </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
 </head>
 
 <body>
 
 <div class="container">
 
-    <h1>📷 Face Registration</h1>
-
-    <div class="student-info">
-
-        <p>
-            <b>Student ID:</b>
-            {{ student[0] }}
-        </p>
-
-        <p>
-            <b>Name:</b>
-            {{ student[1] }}
-        </p>
-
-        <p>
-            <b>Class:</b>
-            {{ student[2] }}
-        </p>
-
-        <p>
-            <b>Section:</b>
-            {{ student[3] }}
-        </p>
-
+    <div class="header">
+        <h1>📷 AI Multi-Sample Face Registration</h1>
+        <p>Captures 20 face samples at subtle angles for high-accuracy recognition (95%+ accuracy).</p>
     </div>
 
-    <video id="video" autoplay playsinline></video>
+    <!-- STUDENT DETAILS -->
+    <div class="student-card">
+        <div class="student-item">
+            <span>Student ID</span>
+            <strong>#{{ student['student_id'] if student['student_id'] is defined else student[0] }}</strong>
+        </div>
+        <div class="student-item">
+            <span>Student Name</span>
+            <strong>{{ student['name'] if student['name'] is defined else student[2] }}</strong>
+        </div>
+        {% if institution_type == 'college' %}
+        <div class="student-item">
+            <span>Register No</span>
+            <strong>{{ student['roll_number'] if student['roll_number'] is defined and student['roll_number'] else '—' }}</strong>
+        </div>
+        <div class="student-item">
+            <span>Department</span>
+            <strong>{{ student['department'] if student['department'] is defined and student['department'] else student['class_name'] }}</strong>
+        </div>
+        <div class="student-item">
+            <span>Year</span>
+            <strong>{{ student['year'] if student['year'] is defined and student['year'] else '—' }}</strong>
+        </div>
+        {% else %}
+        <div class="student-item">
+            <span>Roll No</span>
+            <strong>{{ student['roll_number'] if student['roll_number'] is defined and student['roll_number'] else '—' }}</strong>
+        </div>
+        <div class="student-item">
+            <span>Class</span>
+            <strong>{{ student['class_name'] if student['class_name'] is defined else student[3] }}</strong>
+        </div>
+        {% endif %}
+        <div class="student-item">
+            <span>Section</span>
+            <strong>{{ student['section'] if student['section'] is defined else student[4] }}</strong>
+        </div>
+    </div>
 
-    <br>
+    <!-- CAMERA CONTAINER -->
+    <div class="camera-wrapper" id="cameraWrapper">
+        <video id="video" autoplay playsinline></video>
+        <div class="face-guide">
+            <div class="guide-text">Align face here</div>
+        </div>
+        <div id="countdownOverlay">3</div>
+    </div>
 
-    <button id="startCamera">
-        📷 Start Camera
-    </button>
+    <!-- PROGRESS & GUIDANCE -->
+    <div class="progress-box">
+        <div class="progress-header">
+            <span id="progressPercent">Progress: 0%</span>
+            <span class="sample-counter" id="sampleCounter">Samples: 0 / 20</span>
+        </div>
+        <div class="prompt-text" id="promptText">👉 Click "Start Camera" then "Start Automatic Capture"</div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
 
-    <button id="capture">
-        📸 Capture Face
-    </button>
+    <!-- CONTROLS -->
+    <div class="controls">
+        <button id="startCameraBtn" type="button">
+            📹 Start Camera
+        </button>
 
-    <button id="back">
-        ← Back
-    </button>
+        <button id="autoCaptureBtn" type="button" disabled>
+            🚀 Start Automatic Capture (20 Samples)
+        </button>
 
+        <button id="singleCaptureBtn" type="button" disabled>
+            📸 Single Photo
+        </button>
+
+        <a href="{{ url_for('students') }}" id="backBtn">
+            ← Back to Students
+        </a>
+    </div>
+
+    <div id="statusMessage"></div>
     <canvas id="canvas"></canvas>
-
-    <div id="message"></div>
 
 </div>
 
-
 <script>
+    const studentId = "{{ student['student_id'] if student['student_id'] is defined else student[0] }}";
+    const TOTAL_SAMPLES = 20;
 
-const video = document.getElementById("video");
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const cameraWrapper = document.getElementById("cameraWrapper");
+    const countdownOverlay = document.getElementById("countdownOverlay");
 
-const canvas = document.getElementById("canvas");
+    const startCameraBtn = document.getElementById("startCameraBtn");
+    const autoCaptureBtn = document.getElementById("autoCaptureBtn");
+    const singleCaptureBtn = document.getElementById("singleCaptureBtn");
+    const backBtn = document.getElementById("backBtn");
 
-const startCamera =
-    document.getElementById("startCamera");
+    const progressBar = document.getElementById("progressBar");
+    const progressPercent = document.getElementById("progressPercent");
+    const sampleCounter = document.getElementById("sampleCounter");
+    const promptText = document.getElementById("promptText");
+    const statusMessage = document.getElementById("statusMessage");
 
-const capture =
-    document.getElementById("capture");
+    let stream = null;
+    let isCapturing = false;
 
-const back =
-    document.getElementById("back");
-
-const message =
-    document.getElementById("message");
-
-let stream = null;
-
-
-// START CAMERA
-
-startCamera.onclick = async function() {
-
-    try {
-
-        stream =
-            await navigator.mediaDevices.getUserMedia({
-                video: true,
+    // 1. START CAMERA
+    startCameraBtn.onclick = async function () {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480 },
                 audio: false
             });
+            video.srcObject = stream;
 
-        video.srcObject = stream;
+            startCameraBtn.disabled = true;
+            autoCaptureBtn.disabled = false;
+            singleCaptureBtn.disabled = false;
 
-        message.innerHTML =
-            "🟢 Camera started successfully.";
+            promptText.innerHTML = "✅ Camera ready! Click 'Start Automatic Capture' to register face.";
+            statusMessage.className = "msg-info";
+            statusMessage.innerText = "Camera active. Please look directly into the guide.";
+        } catch (err) {
+            console.error("Camera error:", err);
+            statusMessage.className = "msg-error";
+            statusMessage.innerText = "❌ Unable to access webcam. Please verify camera permissions.";
+        }
+    };
 
+    // Helper: Capture a single frame from video as Blob
+    function captureFrameBlob() {
+        return new Promise((resolve) => {
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext("2d");
+
+            // Mirror canvas to match unmirrored facial coordinates
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                resolve(blob);
+            }, "image/jpeg", 0.92);
+        });
     }
 
-    catch (error) {
+    // 2. AUTOMATIC MULTI-SAMPLE CAPTURE
+    autoCaptureBtn.onclick = async function () {
+        if (!stream || isCapturing) return;
 
-        console.log(error);
+        isCapturing = true;
+        autoCaptureBtn.disabled = true;
+        singleCaptureBtn.disabled = true;
+        backBtn.style.pointerEvents = "none";
 
-        message.innerHTML =
-            "❌ Camera permission denied.";
+        // 3-2-1 Countdown
+        countdownOverlay.style.display = "block";
+        for (let i = 3; i >= 1; i--) {
+            countdownOverlay.innerText = i;
+            promptText.innerText = `Get ready! Capturing starts in ${i}...`;
+            await new Promise((r) => setTimeout(r, 900));
+        }
+        countdownOverlay.style.display = "none";
 
-    }
+        const sampleBlobs = [];
 
-};
+        // Dynamic Posture Prompts
+        const prompts = [
+            "👤 Look straight into the camera",
+            "👤 Keep looking straight",
+            "👈 Turn head slightly to the left",
+            "👈 Tilt head slightly left",
+            "👉 Turn head slightly to the right",
+            "👉 Tilt head slightly right",
+            "😊 Smile or change expression slightly",
+            "✅ Finalizing samples..."
+        ];
 
+        for (let i = 1; i <= TOTAL_SAMPLES; i++) {
+            // Visual snap flash
+            cameraWrapper.classList.add("snapping");
+            setTimeout(() => cameraWrapper.classList.remove("snapping"), 90);
 
-// CAPTURE FACE
+            // Update prompts based on sample progress
+            const promptIdx = Math.min(Math.floor((i / TOTAL_SAMPLES) * prompts.length), prompts.length - 1);
+            promptText.innerText = prompts[promptIdx];
 
-capture.onclick = function() {
+            // Grab frame
+            const blob = await captureFrameBlob();
+            sampleBlobs.push(blob);
 
-    if (stream === null) {
+            // Update progress UI
+            const pct = Math.round((i / TOTAL_SAMPLES) * 100);
+            progressBar.style.width = pct + "%";
+            progressPercent.innerText = `Progress: ${pct}%`;
+            sampleCounter.innerText = `Samples: ${i} / ${TOTAL_SAMPLES}`;
 
-        message.innerHTML =
-            "⚠️ Start the camera first.";
+            // 180ms delay between frames
+            await new Promise((r) => setTimeout(r, 180));
+        }
 
-        return;
+        // Upload samples & train model
+        promptText.innerText = "⚡ Processing samples with CLAHE & retraining AI face model...";
+        statusMessage.className = "msg-info";
+        statusMessage.innerText = "Uploading 20 face samples to server...";
 
-    }
-
-    canvas.width = video.videoWidth;
-
-    canvas.height = video.videoHeight;
-
-    const context =
-        canvas.getContext("2d");
-
-    context.drawImage(
-        video,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    canvas.toBlob(function(blob) {
-
-        const formData =
-            new FormData();
-
-        formData.append(
-            "image",
-            blob,
-            "face.jpg"
-        );
-
-        message.innerHTML =
-            "⏳ Checking face...";
-
-
-        fetch(
-            "/save_face/{{ student[0] }}",
-            {
-                method: "POST",
-                body: formData
-            }
-        )
-
-        .then(function(response) {
-
-            return response.json();
-
-        })
-
-        .then(function(data) {
-
-            message.innerHTML =
-                data.message;
-
-        })
-
-        .catch(function(error) {
-
-            console.log(error);
-
-            message.innerHTML =
-                "❌ Error sending image.";
-
+        const formData = new FormData();
+        sampleBlobs.forEach((b, idx) => {
+            formData.append("images", b, `sample_${idx + 1}.jpg`);
         });
 
-    }, "image/jpeg");
+        try {
+            const res = await fetch(`/save_face_samples/${studentId}`, {
+                method: "POST",
+                body: formData
+            });
 
-};
+            const data = await res.json();
 
+            if (data.success) {
+                progressBar.style.background = "#22c55e";
+                promptText.innerText = "🎉 Face Registration Complete!";
+                statusMessage.className = "msg-success";
+                statusMessage.innerText = `✅ ${data.message} Redirecting to Students...`;
 
-// BACK
-
-back.onclick = function() {
-
-    if (stream) {
-
-        stream.getTracks().forEach(
-            function(track) {
-                track.stop();
+                setTimeout(() => {
+                    stopCamera();
+                    window.location.href = "/students";
+                }, 2000);
+            } else {
+                isCapturing = false;
+                autoCaptureBtn.disabled = false;
+                singleCaptureBtn.disabled = false;
+                backBtn.style.pointerEvents = "auto";
+                statusMessage.className = "msg-error";
+                statusMessage.innerText = "❌ " + data.message;
+                promptText.innerText = "⚠️ Capture failed. Please try again with better lighting.";
             }
-        );
+        } catch (err) {
+            console.error(err);
+            isCapturing = false;
+            autoCaptureBtn.disabled = false;
+            singleCaptureBtn.disabled = false;
+            backBtn.style.pointerEvents = "auto";
+            statusMessage.className = "msg-error";
+            statusMessage.innerText = "❌ Network error communicating with server.";
+        }
+    };
 
+    // 3. SINGLE SNAPSHOT CAPTURE (Fallback)
+    singleCaptureBtn.onclick = async function () {
+        if (!stream || isCapturing) return;
+
+        singleCaptureBtn.disabled = true;
+        autoCaptureBtn.disabled = true;
+        promptText.innerText = "⏳ Saving single face snapshot...";
+
+        const blob = await captureFrameBlob();
+        const formData = new FormData();
+        formData.append("image", blob, "face.jpg");
+
+        try {
+            const res = await fetch(`/save_face_samples/${studentId}`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                progressBar.style.width = "100%";
+                statusMessage.className = "msg-success";
+                statusMessage.innerText = "✅ " + data.message;
+                setTimeout(() => {
+                    stopCamera();
+                    window.location.href = "/students";
+                }, 1800);
+            } else {
+                singleCaptureBtn.disabled = false;
+                autoCaptureBtn.disabled = false;
+                statusMessage.className = "msg-error";
+                statusMessage.innerText = "❌ " + data.message;
+            }
+        } catch (err) {
+            singleCaptureBtn.disabled = false;
+            autoCaptureBtn.disabled = false;
+            statusMessage.className = "msg-error";
+            statusMessage.innerText = "❌ Error uploading image.";
+        }
+    };
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach((track) => track.stop());
+            stream = null;
+        }
     }
 
-    window.location.href = "/students";
-
-};
-
+    window.addEventListener("beforeunload", stopCamera);
 </script>
 
+<script src="{{ url_for('static', filename='theme.js') }}"></script>
 </body>
-
 </html>

@@ -2,462 +2,754 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Take Attendance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Take Attendance - Automated Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
 
     <style>
-
         * {
             box-sizing: border-box;
         }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f7fb;
-            color: #222;
+            padding: 0;
+            padding-left: 286px;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            font-family: Arial, Helvetica, sans-serif;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
-        .header {
-            background: #1f2937;
-            color: white;
-            padding: 20px;
-            text-align: center;
+        .main-content {
+            padding: 35px 40px;
+            min-height: 100vh;
         }
 
-        .header h1 {
+        .page-header {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 24px 30px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: var(--shadow);
+            transition: background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .page-header h1 {
             margin: 0;
+            font-size: 26px;
+            color: var(--text-primary);
+            font-weight: 700;
         }
 
-        .header p {
-            margin: 8px 0 0;
-            color: #d1d5db;
+        .page-header p {
+            margin: 5px 0 0;
+            color: var(--text-secondary);
+            font-size: 14px;
         }
 
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 35px auto;
-        }
-
-        .camera-card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.10);
-            text-align: center;
-        }
-
-        .camera-box {
-            width: 100%;
-            max-width: 700px;
-            height: 430px;
-            margin: 0 auto 25px;
-            background: #111827;
+        .kiosk-btn {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 11px 18px;
             border-radius: 12px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .kiosk-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        /* ATTENDANCE WORKSPACE GRID */
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        /* CAMERA CARD */
+        .camera-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .camera-view-wrapper {
+            position: relative;
+            width: 100%;
+            height: 380px;
+            background: #000;
+            border-radius: 14px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
-        video {
+        #attendanceVideo {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transform: scaleX(-1); /* Mirror view */
         }
 
-        .status {
-            padding: 15px;
-            border-radius: 10px;
-            background: #f3f4f6;
-            margin: 20px auto;
-            max-width: 700px;
-            font-size: 18px;
-            font-weight: bold;
+        #detectionCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            transform: scaleX(-1); /* Match mirrored video */
         }
 
-        .success {
-            color: #15803d;
-            background: #dcfce7;
+        /* SCANNING LASER */
+        .scan-laser {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #60a5fa, transparent);
+            box-shadow: 0 0 12px #3b82f6;
+            animation: scanAnimation 2.4s ease-in-out infinite alternate;
+            pointer-events: none;
         }
 
-        .error {
-            color: #b91c1c;
-            background: #fee2e2;
+        @keyframes scanAnimation {
+            0% { top: 12%; }
+            100% { top: 88%; }
         }
 
-        .info {
-            color: #1d4ed8;
-            background: #dbeafe;
-        }
-
-        .buttons {
-            margin-top: 20px;
-        }
-
-        button,
-        .back-btn {
-            border: none;
-            padding: 12px 22px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin: 5px;
-        }
-
-        .start-btn {
-            background: #2563eb;
-            color: white;
-        }
-
-        .start-btn:hover {
-            background: #1d4ed8;
-        }
-
-        .stop-btn {
-            background: #dc2626;
-            color: white;
-        }
-
-        .stop-btn:hover {
-            background: #b91c1c;
-        }
-
-        .back-btn {
-            background: #6b7280;
-            color: white;
-        }
-
-        .back-btn:hover {
-            background: #4b5563;
-        }
-
-        .attendance-info {
+        /* STATUS BADGE */
+        .status-pill {
+            margin-top: 18px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 25px;
+            align-items: center;
+            gap: 10px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            transition: all 0.25s ease;
+        }
+
+        .status-pill.success {
+            background: rgba(22, 163, 74, 0.12);
+            border-color: rgba(22, 163, 74, 0.3);
+            color: #16a34a;
+        }
+
+        .status-pill.warning {
+            background: rgba(245, 158, 11, 0.12);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #d97706;
+        }
+
+        .status-pill.error {
+            background: rgba(220, 38, 38, 0.12);
+            border-color: rgba(220, 38, 38, 0.3);
+            color: #dc2626;
+        }
+
+        /* CAMERA CONTROLS */
+        .camera-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
             flex-wrap: wrap;
         }
 
-        .info-card {
-            background: #f8fafc;
-            padding: 20px 30px;
+        .ctrl-btn {
+            padding: 10px 18px;
             border-radius: 10px;
-            min-width: 180px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .info-card h2 {
-            margin: 0;
-            font-size: 30px;
+        .ctrl-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
         }
 
-        .info-card p {
-            margin: 8px 0 0;
-            color: #666;
+        .ctrl-btn.primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
         }
 
-        @media (max-width: 700px) {
+        .ctrl-btn.primary:hover {
+            background: var(--primary-hover);
+            color: white;
+        }
 
-            .container {
-                width: 95%;
+        /* STATS & LIVE LIST CARD */
+        .attendance-side {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-mini-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .mini-stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .mini-stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .mini-stat-icon.blue {
+            background: rgba(37, 99, 235, 0.1);
+            color: #2563eb;
+        }
+
+        .mini-stat-icon.green {
+            background: rgba(22, 163, 74, 0.1);
+            color: #16a34a;
+        }
+
+        .mini-stat-card span {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+
+        .mini-stat-card strong {
+            display: block;
+            font-size: 24px;
+            color: var(--text-primary);
+        }
+
+        /* LIVE ATTENDANCE LOG */
+        .live-log-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            max-height: 450px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .live-log-card h3 {
+            margin: 0 0 14px;
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .log-table-wrapper {
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .log-table th {
+            background: var(--table-header-bg);
+            color: var(--text-secondary);
+            font-size: 12px;
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .log-table td {
+            padding: 12px;
+            font-size: 13px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .log-table tr:hover td {
+            background: var(--input-bg);
+        }
+
+        .time-badge {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--input-bg);
+            padding: 3px 7px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .new-entry-row {
+            animation: highlightIn 1.5s ease;
+        }
+
+        @keyframes highlightIn {
+            0% { background: rgba(22, 163, 74, 0.25); }
+            100% { background: transparent; }
+        }
+
+        @media (max-width: 1000px) {
+            body {
+                padding-left: 0;
             }
 
-            .camera-card {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .main-content {
                 padding: 20px;
             }
 
-            .camera-box {
-                height: 300px;
+            .attendance-grid {
+                grid-template-columns: 1fr;
             }
-
         }
-
     </style>
-
 </head>
-
 
 <body>
 
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+    <aside class="sidebar">
 
-<!-- HEADER -->
-
-<div class="header">
-
-    <h1>
-        🤖 Automated Attendance
-    </h1>
-
-    <p>
-        AI Face Recognition Attendance System
-    </p>
-
-</div>
-
-
-<!-- MAIN -->
-
-<div class="container">
-
-    <div class="camera-card">
-
-
-        <h2>
-            📷 Live Attendance Camera
-        </h2>
-
-
-        <p>
-            Look directly at the camera.
-            The AI will recognize the registered student.
-        </p>
-
-
-        <!-- CAMERA -->
-
-        <div class="camera-box">
-
-            <video
-                id="camera"
-                autoplay
-                playsinline>
-            </video>
-
+        <div class="brand">
+            <h2>🎓 Attendance</h2>
+            <p>Smart Attendance Management</p>
         </div>
 
-
-        <!-- STATUS -->
-
-        <div
-            id="status"
-            class="status info">
-
-            🔵 Camera is ready.
-            Click <strong>Start Camera</strong>.
-
-        </div>
-
-
-        <!-- BUTTONS -->
-
-        <div class="buttons">
-
-            <button
-                id="startBtn"
-                class="start-btn"
-                onclick="startCamera()">
-
-                📷 Start Camera
-
-            </button>
-
-
-            <button
-                id="stopBtn"
-                class="stop-btn"
-                onclick="stopCamera()"
-                disabled>
-
-                ⛔ Stop Camera
-
-            </button>
-
-
-            <a
-                href="{{ url_for('dashboard') }}"
-                class="back-btn">
-
-                ← Dashboard
-
+        <nav class="nav-menu">
+            <a href="{{ url_for('dashboard') }}" class="nav-link">
+                <span class="sidebar-icon">🏠</span>
+                <span>Dashboard</span>
             </a>
 
+            <a href="{{ url_for('students') }}" class="nav-link">
+                <span class="sidebar-icon">👨‍🎓</span>
+                <span>Student Management</span>
+            </a>
+
+            <a href="{{ url_for('add_student') }}" class="nav-link">
+                <span class="sidebar-icon">➕</span>
+                <span>Add Student</span>
+            </a>
+
+            <a href="{{ url_for('take_attendance') }}" class="nav-link active">
+                <span class="sidebar-icon">📷</span>
+                <span>Take Attendance</span>
+            </a>
+
+            <a href="{{ url_for('attendance_reports') }}" class="nav-link">
+                <span class="sidebar-icon">📊</span>
+                <span>Attendance Reports</span>
+            </a>
+
+            <a href="{{ url_for('attendance_setup') }}" class="nav-link">
+                <span class="sidebar-icon">⚙️</span>
+                <span>Attendance Schedule</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button type="button" id="themeToggle" class="theme-switch-btn dark-mode-button" title="Toggle light / dark mode">
+                <span class="sidebar-icon theme-icon">🌙</span>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <span class="sidebar-icon">🚪</span>
+                <span>Logout</span>
+            </a>
         </div>
 
+    </aside>
 
-        <!-- ATTENDANCE INFORMATION -->
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+    <main class="main-content">
 
-        <div class="attendance-info">
+        <!-- PAGE HEADER -->
+        <section class="page-header">
+            <div>
+                <h1>📷 Live Attendance Camera</h1>
+                <p>Students look into the camera to automatically record attendance with AI face recognition.</p>
+            </div>
+            <div>
+                <a href="{{ url_for('start_kiosk_process') }}" class="kiosk-btn" title="Open standalone external window">
+                    🖥️ Launch Standalone Desktop Kiosk
+                </a>
+            </div>
+        </section>
 
+        <!-- ATTENDANCE WORKSPACE -->
+        <div class="attendance-grid">
 
-            <div class="info-card">
+            <!-- CAMERA VIEWPORT -->
+            <div class="camera-card">
+                <div class="camera-view-wrapper">
+                    <video id="attendanceVideo" autoplay playsinline muted></video>
+                    <canvas id="detectionCanvas"></canvas>
+                    <div class="scan-laser" id="scanLaser"></div>
+                </div>
 
-                <h2 id="presentCount">
-                    {{ present_today }}
-                </h2>
+                <!-- STATUS PILL -->
+                <div id="statusPill" class="status-pill">
+                    <span id="statusIcon">🔵</span>
+                    <span id="statusText">Starting camera... Position your face in view.</span>
+                </div>
 
-                <p>
-                    Present Today
-                </p>
+                <!-- CONTROLS -->
+                <div class="camera-controls">
+                    <button type="button" id="pauseBtn" class="ctrl-btn" onclick="toggleCameraPause()">
+                        ⏸️ Pause Scanner
+                    </button>
+                    <a href="{{ url_for('dashboard') }}" class="ctrl-btn">
+                        ← Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- ATTENDANCE LOG & STATS -->
+            <div class="attendance-side">
+
+                <!-- MINI STATS -->
+                <div class="stats-mini-grid">
+                    <div class="mini-stat-card">
+                        <div class="mini-stat-icon blue">👨‍🎓</div>
+                        <div>
+                            <span>Registered Students</span>
+                            <strong id="statTotalStudents">{{ total_students }}</strong>
+                        </div>
+                    </div>
+                    <div class="mini-stat-card">
+                        <div class="mini-stat-icon green">✅</div>
+                        <div>
+                            <span>Marked Today</span>
+                            <strong id="statPresentToday">{{ present_today }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TODAY'S LIVE LOG -->
+                <div class="live-log-card">
+                    <h3>
+                        <span>📋 Today's Verified Log</span>
+                        <span style="font-size: 12px; font-weight: normal; color: var(--text-secondary);" id="liveTimeBadge">Live</span>
+                    </h3>
+
+                    <div class="log-table-wrapper">
+                        <table class="log-table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>{{ 'Dept / Year' if institution_type == 'college' else 'Class' }}</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceLogBody">
+                                {% if today_records and today_records|length > 0 %}
+                                    {% for r in today_records %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ r.name }}</strong>
+                                            {% if r.roll_number %}
+                                            <br><small style="color: var(--text-secondary);">{{ 'Reg: ' if institution_type == 'college' else 'Roll: ' }}{{ r.roll_number }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ r.department if r.department else r.class_name }}{% if r.section %} - {{ r.section }}{% endif %}</td>
+                                        <td><span class="time-badge">{{ r.time }}</span></td>
+                                        <td><span style="color: #16a34a; font-weight: bold;">✅ Present</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr id="noRecordsRow">
+                                        <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 30px;">
+                                            No students marked yet today.<br>Camera will automatically verify and log them here.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
             </div>
 
-
-            <div class="info-card">
-
-                <h2 id="totalCount">
-                    {{ total_students }}
-                </h2>
-
-                <p>
-                    Total Students
-                </p>
-
-            </div>
-
-
         </div>
 
+    </main>
 
-    </div>
+    <!-- HIDDEN PROCESSING CANVAS -->
+    <canvas id="hiddenCanvas" style="display: none;"></canvas>
 
-</div>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+        const video = document.getElementById("attendanceVideo");
+        const canvas = document.getElementById("detectionCanvas");
+        const hiddenCanvas = document.getElementById("hiddenCanvas");
+        const statusPill = document.getElementById("statusPill");
+        const statusIcon = document.getElementById("statusIcon");
+        const statusText = document.getElementById("statusText");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const statPresentToday = document.getElementById("statPresentToday");
+        const attendanceLogBody = document.getElementById("attendanceLogBody");
+        const noRecordsRow = document.getElementById("noRecordsRow");
 
+        let stream = null;
+        let isScannerPaused = false;
+        let isProcessingFrame = false;
+        let scanInterval = null;
+        let markedStudentSet = new Set({{ marked_ids | tojson if marked_ids else '[]' }});
 
-<script>
+        // Synthetic Chime via Web Audio API (Guaranteed to work without external audio files)
+        function playSuccessChime() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
 
-    let stream = null;
+                const now = ctx.currentTime;
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const gain = ctx.createGain();
 
+                osc1.type = "sine";
+                osc1.frequency.setValueAtTime(523.25, now); // C5
+                osc1.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5
 
-    // ==================================================
-    // START CAMERA
-    // ==================================================
+                osc2.type = "sine";
+                osc2.frequency.setValueAtTime(659.25, now + 0.15);
+                osc2.frequency.exponentialRampToValueAtTime(783.99, now + 0.35); // G5
 
-    async function startCamera() {
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
 
-        const video =
-            document.getElementById("camera");
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(ctx.destination);
 
-        const status =
-            document.getElementById("status");
+                osc1.start(now);
+                osc1.stop(now + 0.2);
+                osc2.start(now + 0.15);
+                osc2.stop(now + 0.5);
+            } catch (e) {
+                console.log("Audio not allowed yet:", e);
+            }
+        }
 
-        const startBtn =
-            document.getElementById("startBtn");
-
-        const stopBtn =
-            document.getElementById("stopBtn");
-
-
-        try {
-
-            stream =
-                await navigator.mediaDevices.getUserMedia({
-                    video: true,
+        // START IN-BROWSER CAMERA
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: "user"
+                    },
                     audio: false
                 });
 
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    canvas.width = video.videoWidth || 640;
+                    canvas.height = video.videoHeight || 480;
+                    hiddenCanvas.width = video.videoWidth || 640;
+                    hiddenCanvas.height = video.videoHeight || 480;
 
-            video.srcObject = stream;
-
-
-            status.className =
-                "status success";
-
-            status.innerHTML =
-                "🟢 Camera started. " +
-                "Look at the camera.";
-
-
-            startBtn.disabled = true;
-
-            stopBtn.disabled = false;
-
-
-        } catch (error) {
-
-            console.error(error);
-
-
-            status.className =
-                "status error";
-
-            status.innerHTML =
-                "❌ Camera access failed. " +
-                "Please allow camera permission.";
-
+                    updateStatus("success", "🟢", "Camera active. Looking for registered student faces...");
+                    startFrameScanning();
+                };
+            } catch (err) {
+                console.error("Camera access error:", err);
+                updateStatus("error", "❌", "Camera permission denied or camera in use. Please allow camera access in browser.");
+            }
         }
 
-    }
-
-
-    // ==================================================
-    // STOP CAMERA
-    // ==================================================
-
-    function stopCamera() {
-
-        const video =
-            document.getElementById("camera");
-
-        const status =
-            document.getElementById("status");
-
-        const startBtn =
-            document.getElementById("startBtn");
-
-        const stopBtn =
-            document.getElementById("stopBtn");
-
-
-        if (stream) {
-
-            stream
-                .getTracks()
-                .forEach(track => track.stop());
-
-            stream = null;
-
+        function updateStatus(state, icon, text) {
+            statusPill.className = "status-pill " + state;
+            statusIcon.textContent = icon;
+            statusText.textContent = text;
         }
 
+        function toggleCameraPause() {
+            isScannerPaused = !isScannerPaused;
+            if (isScannerPaused) {
+                pauseBtn.innerHTML = "▶️ Resume Scanner";
+                updateStatus("warning", "⏸️", "Scanner paused. Click Resume to continue recognizing.");
+            } else {
+                pauseBtn.innerHTML = "⏸️ Pause Scanner";
+                updateStatus("success", "🟢", "Scanner active. Looking for student faces...");
+            }
+        }
 
-        video.srcObject = null;
+        // FRAME CAPTURE & RECOGNITION LOOP
+        function startFrameScanning() {
+            if (scanInterval) clearInterval(scanInterval);
 
+            scanInterval = setInterval(async () => {
+                if (isScannerPaused || isProcessingFrame || !video.videoWidth) return;
 
-        status.className =
-            "status info";
+                isProcessingFrame = true;
 
-        status.innerHTML =
-            "🔵 Camera stopped.";
+                try {
+                    const hctx = hiddenCanvas.getContext("2d");
+                    hctx.drawImage(video, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
+                    const base64Image = hiddenCanvas.toDataURL("image/jpeg", 0.75);
 
+                    const response = await fetch("{{ url_for('api_recognize_attendance') }}", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ image: base64Image })
+                    });
 
-        startBtn.disabled = false;
+                    const data = await response.json();
+                    handleRecognitionResult(data);
+                } catch (err) {
+                    console.error("Frame recognition error:", err);
+                } finally {
+                    isProcessingFrame = false;
+                }
+            }, 650); // Scan every 650ms for snappy responsiveness
+        }
 
-        stopBtn.disabled = true;
+        function handleRecognitionResult(data) {
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    }
-
-
-    // ==================================================
-    // STOP CAMERA WHEN PAGE CLOSES
-    // ==================================================
-
-    window.addEventListener(
-        "beforeunload",
-        function () {
-
-            if (stream) {
-
-                stream
-                    .getTracks()
-                    .forEach(track => track.stop());
-
+            if (!data.success) {
+                return;
             }
 
+            if (data.recognized && data.student_id) {
+                const name = data.name;
+                const studentId = data.student_id;
+                const className = data.class_name;
+                const section = data.section;
+                const alreadyMarked = data.already_marked;
+
+                // Draw bounding box on canvas overlay
+                if (data.box) {
+                    const b = data.box;
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = alreadyMarked ? "#3b82f6" : "#22c55e";
+                    ctx.strokeRect(b.x, b.y, b.w, b.h);
+
+                    // Name header tag
+                    ctx.fillStyle = alreadyMarked ? "#3b82f6" : "#22c55e";
+                    ctx.fillRect(b.x, b.y - 28, b.w, 28);
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 14px Arial";
+                    ctx.fillText(`${name} (${className}-${section})`, b.x + 6, b.y - 8);
+                }
+
+                if (!markedStudentSet.has(studentId)) {
+                    // NEWLY MARKED PRESENT!
+                    markedStudentSet.add(studentId);
+                    playSuccessChime();
+
+                    updateStatus("success", "✅", `VERIFIED & MARKED: ${name} (Class ${className}-${section}) — Present!`);
+
+                    // Update count
+                    let count = parseInt(statPresentToday.textContent) || 0;
+                    statPresentToday.textContent = count + 1;
+
+                    // Add row to live log
+                    if (noRecordsRow) {
+                        noRecordsRow.remove();
+                    }
+
+                    const nowTime = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+                    const newRow = document.createElement("tr");
+                    newRow.className = "new-entry-row";
+                    newRow.innerHTML = `
+                        <td><strong>${name}</strong></td>
+                        <td>${className}-${section}</td>
+                        <td><span class="time-badge">${nowTime}</span></td>
+                        <td><span style="color: #16a34a; font-weight: bold;">✅ Present</span></td>
+                    `;
+                    attendanceLogBody.insertBefore(newRow, attendanceLogBody.firstChild);
+
+                } else {
+                    // ALREADY PRESENT
+                    updateStatus("success", "🟢", `${name} is already marked Present today.`);
+                }
+            } else if (data.faces_detected > 0) {
+                // Face detected, checking or unknown
+                updateStatus("warning", "🔍", "Face detected — scanning profile against student database...");
+            }
         }
-    );
 
-</script>
+        window.addEventListener("DOMContentLoaded", () => {
+            startCamera();
+        });
 
-
+        window.addEventListener("beforeunload", () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            if (scanInterval) clearInterval(scanInterval);
+        });
+    </script>
 </body>
-
 </html>

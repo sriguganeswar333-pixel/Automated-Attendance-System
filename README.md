@@ -1,4 +1,4 @@
-# 🎓 Automated Attendance System
+   # 🎓 Automated Attendance System
 
 > **AI-powered student attendance management using Face Recognition, OpenCV, Flask, and SQLite.**
 

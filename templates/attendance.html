@@ -2,1334 +2,934 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Attendance Reports</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Reports & Defaulters - Automated Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
 
     <style>
-
         * {
             box-sizing: border-box;
         }
 
-
         body {
-
             margin: 0;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            background: #f4f7fb;
-
-            color: #111827;
+            padding: 0;
+            padding-left: 286px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
-
 
         .container {
-
-            width: 95%;
-
-            max-width: 1450px;
-
-            margin: 20px auto 50px;
+            width: 100%;
+            max-width: 100%;
+            padding: 35px 40px;
+            margin: 0;
         }
-
 
         /* ==================================================
-           BACK BUTTON
+           PAGE HEADER
         ================================================== */
-
-        .back-button {
-
-            display: inline-block;
-
-            padding: 10px 18px;
-
-            background: #1f2937;
-
-            color: white;
-
-            text-decoration: none;
-
-            border-radius: 7px;
-
-            font-size: 14px;
-
-            font-weight: bold;
-
-            margin-bottom: 12px;
-        }
-
-
-        .back-button:hover {
-
-            background: #374151;
-        }
-
-
-        /* ==================================================
-           HEADER
-        ================================================== */
-
         .page-header {
-
-            background: white;
-
-            padding: 25px;
-
-            border-radius: 14px;
-
-            box-shadow:
-                0 4px 15px
-                rgba(0,0,0,0.06);
-
-            margin-bottom: 18px;
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            padding: 24px 30px;
+            border-radius: 18px;
+            box-shadow: var(--shadow) !important;
+            margin-bottom: 24px;
+            transition: background 0.25s ease, border-color 0.25s ease;
         }
 
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
 
         .page-header h1 {
-
-            margin: 0 0 7px;
-
-            font-size: 28px;
+            margin: 0 0 6px;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary) !important;
         }
 
-
         .page-header p {
-
             margin: 0;
-
-            color: #6b7280;
-
+            color: var(--text-secondary) !important;
             font-size: 14px;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-excel {
+            background: #16a34a;
+            color: white;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+        }
+
+        .btn-excel:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+        }
+
+        .btn-csv {
+            background: #0284c7;
+            color: white;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+        }
+
+        .btn-csv:hover {
+            background: #0369a1;
+            transform: translateY(-1px);
+        }
+
+        .btn-print {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-print:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
 
         /* ==================================================
            FILTER BOX
         ================================================== */
-
         .filter-box {
-
-            background: white;
-
-            padding: 22px;
-
-            border-radius: 14px;
-
-            box-shadow:
-                0 4px 15px
-                rgba(0,0,0,0.06);
-
-            margin-bottom: 18px;
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            padding: 24px;
+            border-radius: 18px;
+            box-shadow: var(--shadow) !important;
+            margin-bottom: 24px;
         }
-
 
         .filter-box h2 {
-
-            margin: 0 0 18px;
-
+            margin: 0 0 16px;
             font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary) !important;
         }
-
 
         .filters {
-
             display: grid;
-
-            grid-template-columns:
-                repeat(4, 1fr);
-
-            gap: 14px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
         }
-
 
         .filter-group {
-
             display: flex;
-
             flex-direction: column;
+            gap: 6px;
         }
-
 
         .filter-group label {
-
-            font-size: 12px;
-
-            font-weight: bold;
-
-            margin-bottom: 6px;
-
-            color: #374151;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary) !important;
         }
-
 
         .filter-group input,
         .filter-group select {
-
-            height: 38px;
-
-            padding: 8px 10px;
-
-            border:
-                1px solid #cbd5e1;
-
-            border-radius: 6px;
-
-            background: white;
-
-            font-size: 13px;
+            width: 100%;
+            height: 44px;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color) !important;
+            background: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
         }
 
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: var(--primary-color) !important;
+        }
 
         .filter-actions {
-
-            margin-top: 14px;
-
+            margin-top: 16px;
             display: flex;
-
-            gap: 8px;
+            gap: 10px;
         }
-
 
         .filter-button {
-
-            border: none;
-
-            background: #2563eb;
-
+            padding: 10px 20px;
+            background: var(--primary-color);
             color: white;
-
-            padding: 10px 18px;
-
-            border-radius: 6px;
-
-            font-weight: bold;
-
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
+        .filter-button:hover {
+            background: var(--primary-hover);
+        }
 
         .clear-button {
-
-            background: #6b7280;
-
-            color: white;
-
-            text-decoration: none;
-
             padding: 10px 18px;
-
-            border-radius: 6px;
-
-            font-weight: bold;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
         }
 
+        .clear-button:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
 
         /* ==================================================
            SUMMARY CARDS
         ================================================== */
-
         .summary-grid {
-
             display: grid;
-
-            grid-template-columns:
-                repeat(4, 1fr);
-
-            gap: 14px;
-
-            margin-bottom: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
         }
-
 
         .summary-card {
-
-            background: white;
-
-            padding: 20px;
-
-            border-radius: 12px;
-
-            box-shadow:
-                0 4px 15px
-                rgba(0,0,0,0.06);
-
-            border-left: 4px solid #2563eb;
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 16px;
+            padding: 20px 22px;
+            box-shadow: var(--shadow) !important;
+            transition: all 0.2s ease;
         }
-
-
-        .summary-card.present {
-
-            border-left-color:
-                #16a34a;
-        }
-
-
-        .summary-card.absent {
-
-            border-left-color:
-                #ef4444;
-        }
-
-
-        .summary-card.rate {
-
-            border-left-color:
-                #7c3aed;
-        }
-
 
         .summary-value {
-
-            font-size: 26px;
-
-            font-weight: bold;
-
-            margin-bottom: 5px;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary) !important;
+            margin-bottom: 4px;
         }
-
 
         .summary-title {
-
-            color: #6b7280;
-
-            font-size: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary) !important;
         }
 
+        .summary-card.present .summary-value {
+            color: #16a34a !important;
+        }
+
+        .summary-card.absent .summary-value {
+            color: #dc2626 !important;
+        }
+
+        .summary-card.rate .summary-value {
+            color: #7c3aed !important;
+        }
 
         /* ==================================================
-           DAILY STATUS HEADER
+           DEFAULTERS BOX
         ================================================== */
-
-        .daily-header {
-
-            background: white;
-
-            padding: 20px;
-
-            border-radius: 14px;
-
-            box-shadow:
-                0 4px 15px
-                rgba(0,0,0,0.06);
-
-            margin-bottom: 18px;
+        .defaulters-box {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            border-left: 6px solid #dc2626 !important;
+            padding: 24px;
+            border-radius: 18px;
+            box-shadow: var(--shadow) !important;
+            margin-bottom: 24px;
         }
 
+        .defaulters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
 
-        .daily-header h2 {
-
-            margin: 0 0 7px;
-
+        .defaulters-header h2 {
+            margin: 0;
+            color: #dc2626 !important;
             font-size: 19px;
+            font-weight: 700;
         }
 
-
-        .daily-header p {
-
-            margin: 0;
-
-            color: #6b7280;
-
-            font-size: 13px;
-        }
-
-
-        /* ==================================================
-           PRESENT + ABSENT
-        ================================================== */
-
-        .attendance-grid {
-
-            display: grid;
-
-            grid-template-columns:
-                1fr 1fr;
-
-            gap: 18px;
-
-            margin-bottom: 22px;
-        }
-
-
-        .table-box {
-
-            background: white;
-
-            border-radius: 14px;
-
-            box-shadow:
-                0 4px 15px
-                rgba(0,0,0,0.06);
-
-            overflow: hidden;
-        }
-
-
-        .table-header {
-
-            padding: 16px 18px;
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items: center;
-        }
-
-
-        .present-header {
-
-            background: #ecfdf5;
-
-            border-bottom:
-                2px solid #22c55e;
-        }
-
-
-        .absent-header {
-
-            background: #fef2f2;
-
-            border-bottom:
-                2px solid #ef4444;
-        }
-
-
-        .table-header h2 {
-
-            margin: 0;
-
-            font-size: 16px;
-        }
-
-
-        .present-header h2 {
-
-            color: #047857;
-        }
-
-
-        .absent-header h2 {
-
-            color: #b91c1c;
-        }
-
-
-        .count-badge {
-
-            min-width: 28px;
-
-            height: 28px;
-
-            padding: 0 8px;
-
-            border-radius: 50%;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            color: white;
-
-            font-weight: bold;
-
-            font-size: 12px;
-        }
-
-
-        .present-badge {
-
-            background: #22c55e;
-        }
-
-
-        .absent-badge {
-
-            background: #ef4444;
-        }
-
-
-        table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-        }
-
-
-        th {
-
-            background: #f8fafc;
-
-            color: #374151;
-
-            font-size: 11px;
-
-            padding: 11px 10px;
-
-            text-align: left;
-
-            border-bottom:
-                1px solid #e5e7eb;
-        }
-
-
-        td {
-
-            padding: 12px 10px;
-
-            font-size: 12px;
-
-            border-bottom:
-                1px solid #eef2f7;
-        }
-
-
-        tbody tr:hover {
-
-            background: #f8fafc;
-        }
-
-
-        .present-status {
-
-            color: #15803d;
-
-            font-weight: bold;
-        }
-
-
-        .absent-status {
-
+        .badge-defaulter-count {
+            background: rgba(220, 38, 38, 0.12);
             color: #dc2626;
-
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
             font-weight: bold;
+            font-size: 12px;
         }
 
-
-        .empty {
-
-            text-align: center;
-
-            padding: 28px;
-
-            color: #9ca3af;
-
-            font-size: 13px;
+        .badge-safe {
+            background: rgba(22, 163, 74, 0.12);
+            color: #16a34a;
+            border: 1px solid rgba(22, 163, 74, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
         }
 
+        .badge-shortage {
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
 
         /* ==================================================
-           ATTENDANCE HISTORY
+           TABLES
         ================================================== */
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 24px;
+        }
 
+        .table-box,
         .records-box {
-
-            background: white;
-
-            padding: 18px;
-
-            border-radius: 14px;
-
-            box-shadow:
-                0 4px 15px
-                rgba(0,0,0,0.06);
-
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: var(--shadow) !important;
             overflow-x: auto;
         }
 
+        .records-box {
+            margin-bottom: 24px;
+        }
 
+        .table-header,
         .records-header {
-
             display: flex;
-
-            justify-content:
-                space-between;
-
+            justify-content: space-between;
             align-items: center;
-
-            margin-bottom: 14px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-
+        .table-header h2,
         .records-header h2 {
-
             margin: 0;
-
             font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary) !important;
         }
 
+        .count-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .present-badge {
+            background: rgba(22, 163, 74, 0.12);
+            color: #16a34a;
+        }
+
+        .absent-badge {
+            background: rgba(220, 38, 38, 0.12);
+            color: #dc2626;
+        }
 
         .record-count {
-
-            background: #eff6ff;
-
-            color: #2563eb;
-
-            padding: 6px 12px;
-
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            padding: 4px 12px;
             border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-secondary);
+        }
 
-            font-size: 11px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
 
+        th {
+            background: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color) !important;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+        }
+
+        tr:hover td {
+            background: var(--input-bg) !important;
+        }
+
+        .present-status {
+            color: #16a34a;
             font-weight: bold;
         }
 
-
-        .history-table th {
-
-            background: #1f2937;
-
-            color: white;
+        .absent-status {
+            color: #dc2626;
+            font-weight: bold;
         }
 
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
 
-        /* ==================================================
-           RESPONSIVE
-        ================================================== */
+        /* PRINT STYLING */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                padding-left: 0 !important;
+            }
 
-        @media (max-width: 1000px) {
+            .sidebar,
+            .filter-box,
+            .header-actions,
+            #themeToggle {
+                display: none !important;
+            }
+
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .page-header,
+            .table-box,
+            .records-box,
+            .defaulters-box {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                break-inside: avoid;
+            }
+
+            .print-signatures {
+                display: flex !important;
+                justify-content: space-between;
+                margin-top: 50px;
+                padding-top: 20px;
+            }
+
+            .sig-line {
+                text-align: center;
+                border-top: 1px solid #333;
+                width: 180px;
+                padding-top: 5px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding-left: 0;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .container {
+                padding: 20px;
+            }
 
             .filters {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
-
 
             .summary-grid {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr);
             }
-        }
-
-
-        @media (max-width: 700px) {
 
             .attendance-grid {
-
-                grid-template-columns: 1fr;
-            }
-
-
-            .filters {
-
-                grid-template-columns: 1fr;
-            }
-
-
-            .summary-grid {
-
                 grid-template-columns: 1fr;
             }
         }
-
     </style>
-
 </head>
-
 
 <body>
 
-
-<div class="container">
-
-
-    <!-- ==================================================
-         BACK
-    ================================================== -->
-
-    <a
-        href="{{ url_for('dashboard') }}"
-        class="back-button"
-    >
-        ← Back to Dashboard
-    </a>
-
-
-    <!-- ==================================================
-         PAGE HEADER
-    ================================================== -->
-
-    <div class="page-header">
-
-        <h1>
-            📊 Attendance Reports
-        </h1>
-
-        <p>
-            View and analyze student attendance
-            records and daily attendance status.
-        </p>
-
-    </div>
-
-
-    <!-- ==================================================
-         FILTERS
-    ================================================== -->
-
-    <div class="filter-box">
-
-        <h2>
-            🔎 Attendance Filters
-        </h2>
-
-
-        <form
-            method="GET"
-            action="{{ url_for('attendance_reports') }}"
-        >
-
-            <div class="filters">
-
-
-                <!-- DATE -->
-
-                <div class="filter-group">
-
-                    <label>
-                        Date
-                    </label>
-
-                    <input
-                        type="date"
-                        name="date"
-                        value="{{ selected_date }}"
-                    >
-
-                </div>
-
-
-                <!-- STUDENT -->
-
-                <div class="filter-group">
-
-                    <label>
-                        Student
-                    </label>
-
-                    <select name="student">
-
-                        <option value="">
-                            All Students
-                        </option>
-
-
-                        {% for student in students_list %}
-
-                        <option
-                            value="{{ student['student_id'] }}"
-                            {% if selected_student == student['student_id']|string %}
-                                selected
-                            {% endif %}
-                        >
-
-                            {{ student['name'] }}
-                            — ID {{ student['student_id'] }}
-
-                        </option>
-
-                        {% endfor %}
-
-                    </select>
-
-                </div>
-
-
-                <!-- CLASS -->
-
-                <div class="filter-group">
-
-                    <label>
-                        Class
-                    </label>
-
-                    <input
-                        type="text"
-                        name="class_name"
-                        value="{{ selected_class }}"
-                        placeholder="Example: 10"
-                    >
-
-                </div>
-
-
-                <!-- SECTION -->
-
-                <div class="filter-group">
-
-                    <label>
-                        Section
-                    </label>
-
-                    <input
-                        type="text"
-                        name="section"
-                        value="{{ selected_section }}"
-                        placeholder="Example: A"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="filter-actions">
-
-                <button
-                    type="submit"
-                    class="filter-button"
-                >
-                    🔎 Apply Filter
-                </button>
-
-
-                <a
-                    href="{{ url_for('attendance_reports') }}"
-                    class="clear-button"
-                >
-                    Clear
-                </a>
-
-            </div>
-
-        </form>
-
-    </div>
-
-
-    <!-- ==================================================
-         SUMMARY
-    ================================================== -->
-
-    <div class="summary-grid">
-
-
-        <div class="summary-card">
-
-            <div class="summary-value">
-                {{ total_students }}
-            </div>
-
-            <div class="summary-title">
-                Total Students
-            </div>
-
+    <!-- =====================================================
+         SIDEBAR NAVIGATION
+    ====================================================== -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <h2>🎓 Attendance</h2>
+            <p>Smart Attendance Management</p>
         </div>
 
+        <nav class="nav-menu">
+            <a href="{{ url_for('dashboard') }}" class="nav-link">
+                <span class="sidebar-icon">🏠</span>
+                <span>Dashboard</span>
+            </a>
 
-        <div class="summary-card present">
+            <a href="{{ url_for('students') }}" class="nav-link">
+                <span class="sidebar-icon">👨‍🎓</span>
+                <span>Student Management</span>
+            </a>
 
-            <div class="summary-value">
-                {{ today_present }}
-            </div>
+            <a href="{{ url_for('add_student') }}" class="nav-link">
+                <span class="sidebar-icon">➕</span>
+                <span>Add Student</span>
+            </a>
 
-            <div class="summary-title">
-                Present Students
-            </div>
+            <a href="{{ url_for('take_attendance') }}" class="nav-link">
+                <span class="sidebar-icon">📷</span>
+                <span>Take Attendance</span>
+            </a>
 
+            <a href="{{ url_for('attendance_reports') }}" class="nav-link active">
+                <span class="sidebar-icon">📊</span>
+                <span>Attendance Reports</span>
+            </a>
+
+            <a href="{{ url_for('attendance_setup') }}" class="nav-link">
+                <span class="sidebar-icon">⚙️</span>
+                <span>Attendance Schedule</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <!-- UNIFIED THEME TOGGLE BUTTON -->
+            <button type="button" id="themeToggle" class="theme-switch-btn dark-mode-button" title="Toggle light / dark mode">
+                <span class="sidebar-icon theme-icon">🌙</span>
+                <span class="theme-text">Dark Mode</span>
+            </button>
+
+            <!-- LOGOUT -->
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <span class="sidebar-icon">🚪</span>
+                <span>Logout</span>
+            </a>
         </div>
 
+    </aside>
 
-        <div class="summary-card absent">
+    <!-- =====================================================
+         MAIN CONTAINER
+    ====================================================== -->
+    <div class="container">
 
-            <div class="summary-value">
-                {{ today_absent }}
-            </div>
-
-            <div class="summary-title">
-                Absent Students
-            </div>
-
-        </div>
-
-
-        <div class="summary-card rate">
-
-            <div class="summary-value">
-                {{ attendance_rate }}%
-            </div>
-
-            <div class="summary-title">
-                Attendance Rate
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ==================================================
-         DAILY STATUS
-    ================================================== -->
-
-    <div class="daily-header">
-
-        <h2>
-            📋 Daily Attendance Status
-        </h2>
-
-        <p>
-            Attendance status for
-            <strong>{{ report_date }}</strong>
-        </p>
-
-    </div>
-
-
-    <!-- ==================================================
-         PRESENT + ABSENT TABLES
-    ================================================== -->
-
-    <div class="attendance-grid">
-
-
-        <!-- ==================================================
-             PRESENT STUDENTS
-        ================================================== -->
-
-        <div class="table-box">
-
-
-            <div class="table-header present-header">
-
-                <h2>
-                    ✅ Present Students
-                </h2>
-
-                <div class="count-badge present-badge">
-
-                    {{ today_present }}
-
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <div class="header-content">
+                <div>
+                    <h1>📊 Attendance Reports & Defaulters</h1>
+                    <p>View, analyze, and export student attendance records and examination eligibility (&lt; 75%).</p>
                 </div>
-
+                <div class="header-actions">
+                    <a href="{{ url_for('export_attendance_excel', date=selected_date, student=selected_student, class_name=selected_class, section=selected_section) }}" class="export-btn btn-excel">
+                        📥 Export Excel (.xlsx)
+                    </a>
+                    <a href="{{ url_for('export_attendance_csv', date=selected_date, student=selected_student, class_name=selected_class, section=selected_section) }}" class="export-btn btn-csv">
+                        📄 Export CSV
+                    </a>
+                    <button type="button" onclick="window.print()" class="export-btn btn-print">
+                        🖨️ Print / Official PDF
+                    </button>
+                </div>
             </div>
+        </div>
 
+        <!-- FILTERS -->
+        <div class="filter-box">
+            <h2>🔎 Attendance Filters</h2>
 
-            <table>
+            <form method="GET" action="{{ url_for('attendance_reports') }}">
+                <div class="filters">
 
-                <thead>
+                    <!-- DATE -->
+                    <div class="filter-group">
+                        <label>Date</label>
+                        <input type="date" name="date" value="{{ selected_date }}">
+                    </div>
 
-                    <tr>
+                    <!-- STUDENT -->
+                    <div class="filter-group">
+                        <label>Student</label>
+                        <select name="student">
+                            <option value="">All Students</option>
+                            {% for student in students_list %}
+                            <option value="{{ student['student_id'] }}" {% if selected_student == student['student_id']|string %}selected{% endif %}>
+                                {{ student['name'] }}
+                                {% if student['roll_number'] %} ({{ student['roll_number'] }}){% endif %}
+                                — ID #{{ student['student_id'] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-                        <th>
-                            ID
-                        </th>
-
-                        <th>
-                            Student
-                        </th>
-
-                        <th>
-                            Class
-                        </th>
-
-                        <th>
-                            Section
-                        </th>
-
-                        <th>
-                            Time
-                        </th>
-
-                        <th>
-                            Status
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-
-                {# ==================================================
-                   IMPORTANT FIX:
-                   namespace() allows the variable to survive
-                   inside the Jinja loop.
-                ================================================== #}
-
-
-                {% set ns = namespace(
-                    present_found=false,
-                    present_count=0
-                ) %}
-
-
-                {% for record in attendance_records %}
-
-
-                    {% if record["date"] == report_date
-                          and record["status"] == "Present" %}
-
-
-                        {% set ns.present_found = true %}
-
-                        {% set ns.present_count =
-                            ns.present_count + 1
-                        %}
-
-
-                        <tr>
-
-                            <td>
-                                {{ record["student_id"] }}
-                            </td>
-
-                            <td>
-                                <strong>
-                                    {{ record["name"] }}
-                                </strong>
-                            </td>
-
-                            <td>
-                                {{ record["class_name"] }}
-                            </td>
-
-                            <td>
-                                {{ record["section"] }}
-                            </td>
-
-                            <td>
-                                {{ record["time"] }}
-                            </td>
-
-                            <td class="present-status">
-                                ✓ Present
-                            </td>
-
-                        </tr>
-
-
+                    {% if institution_type == 'college' %}
+                    <!-- COLLEGE: DEPT / YEAR -->
+                    <div class="filter-group">
+                        <label>Department / Year</label>
+                        <input type="text" name="class_name" value="{{ selected_class }}" placeholder="Example: AI & DS or 3rd Year">
+                    </div>
+                    {% else %}
+                    <!-- SCHOOL: CLASS -->
+                    <div class="filter-group">
+                        <label>Class</label>
+                        <input type="text" name="class_name" value="{{ selected_class }}" placeholder="Example: Class 10">
+                    </div>
                     {% endif %}
 
-
-                {% endfor %}
-
-
-                {% if not ns.present_found %}
-
-                    <tr>
-
-                        <td
-                            colspan="6"
-                            class="empty"
-                        >
-
-                            No students present.
-
-                        </td>
-
-                    </tr>
-
-                {% endif %}
-
-
-                </tbody>
-
-            </table>
-
-
-        </div>
-
-
-        <!-- ==================================================
-             ABSENT STUDENTS
-        ================================================== -->
-
-        <div class="table-box">
-
-
-            <div class="table-header absent-header">
-
-                <h2>
-                    ❌ Absent Students
-                </h2>
-
-                <div class="count-badge absent-badge">
-
-                    {{ today_absent }}
+                    <!-- SECTION -->
+                    <div class="filter-group">
+                        <label>Section</label>
+                        <input type="text" name="section" value="{{ selected_section }}" placeholder="Example: A">
+                    </div>
 
                 </div>
 
+                <div class="filter-actions">
+                    <button type="submit" class="filter-button">
+                        🔎 Apply Filter
+                    </button>
+                    <a href="{{ url_for('attendance_reports') }}" class="clear-button">
+                        Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- SUMMARY STATS -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="summary-value">{{ total_students }}</div>
+                <div class="summary-title">Total Registered Students</div>
             </div>
 
+            <div class="summary-card present">
+                <div class="summary-value">{{ today_present }}</div>
+                <div class="summary-title">Present Students ({{ report_date }})</div>
+            </div>
 
-            <table>
+            <div class="summary-card absent">
+                <div class="summary-value">{{ today_absent }}</div>
+                <div class="summary-title">Absent Students ({{ report_date }})</div>
+            </div>
 
-                <thead>
+            <div class="summary-card rate">
+                <div class="summary-value">{{ attendance_rate }}%</div>
+                <div class="summary-title">Attendance Rate</div>
+            </div>
+        </div>
 
-                    <tr>
-
-                        <th>
-                            ID
-                        </th>
-
-                        <th>
-                            Student
-                        </th>
-
-                        <th>
-                            Class
-                        </th>
-
-                        <th>
-                            Section
-                        </th>
-
-                        <th>
-                            Status
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-
-                {% if absent_students %}
-
-
-                    {% for student in absent_students %}
-
-
-                    <tr>
-
-                        <td>
-                            {{ student["student_id"] }}
-                        </td>
-
-                        <td>
-
-                            <strong>
-                                {{ student["name"] }}
-                            </strong>
-
-                        </td>
-
-                        <td>
-                            {{ student["class_name"] }}
-                        </td>
-
-                        <td>
-                            {{ student["section"] }}
-                        </td>
-
-                        <td class="absent-status">
-                            ✕ Absent
-                        </td>
-
-                    </tr>
-
-
-                    {% endfor %}
-
-
+        <!-- DEFAULTERS LIST (< 75% ATTENDANCE) -->
+        <div class="defaulters-box">
+            <div class="defaulters-header">
+                <h2>⚠️ Attendance Defaulters List (&lt; 75%)</h2>
+                {% if defaulters_count > 0 %}
+                    <span class="badge-defaulter-count">{{ defaulters_count }} Student(s) Below 75%</span>
                 {% else %}
-
-
-                    <tr>
-
-                        <td
-                            colspan="5"
-                            class="empty"
-                        >
-
-                            🎉 Everyone is present!
-
-                        </td>
-
-                    </tr>
-
-
+                    <span class="badge-safe">✅ All Students ≥ 75% Eligible</span>
                 {% endif %}
+            </div>
+            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 14px;">
+                Students listed below have less than 75% overall attendance and are debarred from university/college examinations unless condoned.
+            </p>
 
-
+            {% if defaulters_list %}
+            <table class="defaulters-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        {% if institution_type == 'college' %}
+                        <th>Reg No</th>
+                        <th>Student Name</th>
+                        <th>Department</th>
+                        <th>Year</th>
+                        {% else %}
+                        <th>Roll No</th>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        {% endif %}
+                        <th>Section</th>
+                        <th>Total Days</th>
+                        <th>Attended</th>
+                        <th>Attendance %</th>
+                        <th>Shortage</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in defaulters_list %}
+                    <tr>
+                        <td>#{{ d["student_id"] }}</td>
+                        {% if institution_type == 'college' %}
+                        <td><strong>{{ d["roll_number"] if d["roll_number"] else '—' }}</strong></td>
+                        <td><strong>{{ d["name"] }}</strong></td>
+                        <td>{{ d["department"] if d["department"] else d["class_name"] }}</td>
+                        <td>{{ d["year"] if d["year"] else '—' }}</td>
+                        {% else %}
+                        <td><strong>{{ d["roll_number"] if d["roll_number"] else '—' }}</strong></td>
+                        <td><strong>{{ d["name"] }}</strong></td>
+                        <td>{{ d["class_name"] }}</td>
+                        {% endif %}
+                        <td>{{ d["section"] }}</td>
+                        <td>{{ d["total_days"] }}</td>
+                        <td>{{ d["attended_days"] }}</td>
+                        <td style="color: #dc2626; font-weight: bold; font-size: 15px;">{{ d["attendance_percentage"] }}%</td>
+                        <td><span class="badge-shortage">{{ d["shortage"] }} classes needed</span></td>
+                        <td style="color: #b91c1c; font-weight: bold;">⚠️ Critical (Debarred)</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
-
             </table>
-
-
+            {% else %}
+            <div style="text-align: center; padding: 20px; color: #16a34a; font-weight: bold;">
+                🎉 Excellent! Every student currently registered has 75% or higher overall attendance.
+            </div>
+            {% endif %}
         </div>
 
-    </div>
+        <!-- PRESENT + ABSENT TABLES FOR SELECTED DATE -->
+        <div class="attendance-grid">
 
+            <!-- PRESENT STUDENTS -->
+            <div class="table-box">
+                <div class="table-header">
+                    <h2>✅ Present Students</h2>
+                    <div class="count-badge present-badge">{{ today_present }} Present</div>
+                </div>
 
-    <!-- ==================================================
-         ATTENDANCE HISTORY
-    ================================================== -->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            {% if institution_type == 'college' %}
+                            <th>Reg No</th>
+                            <th>Student</th>
+                            <th>Dept</th>
+                            {% else %}
+                            <th>Roll No</th>
+                            <th>Student</th>
+                            <th>Class</th>
+                            {% endif %}
+                            <th>Section</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if present_students and present_students|length > 0 %}
+                            {% for record in present_students %}
+                            <tr>
+                                <td>#{{ record["student_id"] }}</td>
+                                {% if institution_type == 'college' %}
+                                <td>{{ record["roll_number"] if record["roll_number"] else '—' }}</td>
+                                <td><strong>{{ record["name"] }}</strong></td>
+                                <td>{{ record["department"] if record["department"] else record["class_name"] }}</td>
+                                {% else %}
+                                <td>{{ record["roll_number"] if record["roll_number"] else '—' }}</td>
+                                <td><strong>{{ record["name"] }}</strong></td>
+                                <td>{{ record["class_name"] }}</td>
+                                {% endif %}
+                                <td>{{ record["section"] }}</td>
+                                <td>{{ record["time"] }}</td>
+                                <td class="present-status">✓ Present</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="{{ 7 if institution_type == 'college' else 7 }}" class="empty">
+                                    No students marked present on {{ report_date }}.
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
 
-    <div class="records-box">
+            <!-- ABSENT STUDENTS -->
+            <div class="table-box">
+                <div class="table-header">
+                    <h2>❌ Absent Students</h2>
+                    <div class="count-badge absent-badge">{{ today_absent }} Absent</div>
+                </div>
 
-
-        <div class="records-header">
-
-            <h2>
-                📝 Attendance Records
-            </h2>
-
-
-            <div class="record-count">
-
-                {{ attendance_records|length }}
-                Records
-
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            {% if institution_type == 'college' %}
+                            <th>Reg No</th>
+                            <th>Student</th>
+                            <th>Dept</th>
+                            {% else %}
+                            <th>Roll No</th>
+                            <th>Student</th>
+                            <th>Class</th>
+                            {% endif %}
+                            <th>Section</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if absent_students and absent_students|length > 0 %}
+                            {% for student in absent_students %}
+                            <tr>
+                                <td>#{{ student["student_id"] }}</td>
+                                {% if institution_type == 'college' %}
+                                <td>{{ student["roll_number"] if student["roll_number"] else '—' }}</td>
+                                <td><strong>{{ student["name"] }}</strong></td>
+                                <td>{{ student["department"] if student["department"] else student["class_name"] }}</td>
+                                {% else %}
+                                <td>{{ student["roll_number"] if student["roll_number"] else '—' }}</td>
+                                <td><strong>{{ student["name"] }}</strong></td>
+                                <td>{{ student["class_name"] }}</td>
+                                {% endif %}
+                                <td>{{ student["section"] }}</td>
+                                <td class="absent-status">✕ Absent</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="empty">
+                                    🎉 Everyone is present on {{ report_date }}!
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
 
         </div>
 
+        <!-- FULL ATTENDANCE HISTORY -->
+        <div class="records-box">
+            <div class="records-header">
+                <h2>📝 Attendance Activity Logs</h2>
+                <div class="record-count">{{ attendance_records|length }} Total Record(s)</div>
+            </div>
 
-        <table class="history-table">
-
-            <thead>
-
-                <tr>
-
-                    <th>
-                        ID
-                    </th>
-
-                    <th>
-                        Student
-                    </th>
-
-                    <th>
-                        Class
-                    </th>
-
-                    <th>
-                        Section
-                    </th>
-
-                    <th>
-                        Date
-                    </th>
-
-                    <th>
-                        Time
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-
-            {% if attendance_records %}
-
-
-                {% for record in attendance_records %}
-
-
-                <tr>
-
-                    <td>
-                        {{ record["student_id"] }}
-                    </td>
-
-                    <td>
-                        <strong>
-                            {{ record["name"] }}
-                        </strong>
-                    </td>
-
-                    <td>
-                        {{ record["class_name"] }}
-                    </td>
-
-                    <td>
-                        {{ record["section"] }}
-                    </td>
-
-                    <td>
-                        {{ record["date"] }}
-                    </td>
-
-                    <td>
-                        {{ record["time"] }}
-                    </td>
-
-                    <td>
-
-
-                        {% if record["status"] == "Present" %}
-
-                            <span class="present-status">
-                                ✓ Present
-                            </span>
-
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        {% if institution_type == 'college' %}
+                        <th>Reg No</th>
+                        <th>Student</th>
+                        <th>Department</th>
+                        <th>Year</th>
                         {% else %}
-
-                            <span class="absent-status">
-                                ✕ Absent
-                            </span>
-
+                        <th>Roll No</th>
+                        <th>Student</th>
+                        <th>Class</th>
                         {% endif %}
+                        <th>Section</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if attendance_records and attendance_records|length > 0 %}
+                        {% for record in attendance_records %}
+                        <tr>
+                            <td>#{{ record["attendance_id"] }}</td>
+                            {% if institution_type == 'college' %}
+                            <td>{{ record["roll_number"] if record["roll_number"] else '—' }}</td>
+                            <td><strong>{{ record["name"] }}</strong></td>
+                            <td>{{ record["department"] if record["department"] else record["class_name"] }}</td>
+                            <td>{{ record["year"] if record["year"] else '—' }}</td>
+                            {% else %}
+                            <td>{{ record["roll_number"] if record["roll_number"] else '—' }}</td>
+                            <td><strong>{{ record["name"] }}</strong></td>
+                            <td>{{ record["class_name"] }}</td>
+                            {% endif %}
+                            <td>{{ record["section"] }}</td>
+                            <td>{{ record["date"] }}</td>
+                            <td>{{ record["time"] }}</td>
+                            <td>
+                                {% if record["status"] == "Present" %}
+                                    <span class="present-status">✓ Present</span>
+                                {% else %}
+                                    <span class="absent-status">✕ Absent</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="{{ 9 if institution_type == 'college' else 8 }}" class="empty">
+                                📭 No attendance records found matching filters.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
 
-
-                    </td>
-
-                </tr>
-
-
-                {% endfor %}
-
-
-            {% else %}
-
-
-                <tr>
-
-                    <td
-                        colspan="7"
-                        class="empty"
-                    >
-
-                        📭 No attendance records found.
-
-                    </td>
-
-                </tr>
-
-
-            {% endif %}
-
-
-            </tbody>
-
-        </table>
-
+        <!-- PRINT SIGNATURE BLOCK (Official College/School PDF format) -->
+        <div class="print-signatures" style="display: none;">
+            <div class="sig-line">Faculty In-Charge</div>
+            <div class="sig-line">{% if institution_type == 'college' %}Class Advisor / HOD{% else %}Class Teacher{% endif %}</div>
+            <div class="sig-line">{% if institution_type == 'college' %}Principal / Dean{% else %}Headmaster / Principal{% endif %}</div>
+        </div>
 
     </div>
 
-
-</div>
-
-
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </body>
-
 </html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Institution Setup | Automated Attendance System</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #eef2ff, #f8fafc);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 650px;
+            background: white;
+            padding: 45px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            font-size: 30px;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .step {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #6366f1;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            flex: 1;
+            position: relative;
+        }
+
+        .option input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .option label {
+            display: block;
+            padding: 30px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: #ffffff;
+        }
+
+        .option label:hover {
+            border-color: #6366f1;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.12);
+        }
+
+        .option input:checked + label {
+            border-color: #6366f1;
+            background: #eef2ff;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .option h2 {
+            color: #1e293b;
+            font-size: 21px;
+            margin-bottom: 8px;
+        }
+
+        .option p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .continue-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #6366f1;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s ease;
+        }
+
+        .continue-btn:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        .note {
+            text-align: center;
+            margin-top: 20px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 30px 20px;
+            }
+
+            .options {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='theme.css') }}"
+>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <div class="step">
+                STEP 1 OF 2
+            </div>
+
+            <h1>Choose Your Institution</h1>
+
+            <p>
+                Select the type of institution where you want to use
+                the Automated Attendance System.
+            </p>
+        </div>
+
+
+        {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+
+        <form method="POST" action="{{ url_for('institution_setup') }}">
+
+            <div class="options">
+
+                <!-- SCHOOL -->
+                <div class="option">
+
+                    <input
+                        type="radio"
+                        id="school"
+                        name="institution_type"
+                        value="school"
+                    >
+
+                    <label for="school">
+
+                        <div class="icon">
+                            🏫
+                        </div>
+
+                        <h2>School</h2>
+
+                        <p>
+                            For schools managing students,
+                            classes, sections and attendance.
+                        </p>
+
+                    </label>
+
+                </div>
+
+
+                <!-- COLLEGE -->
+                <div class="option">
+
+                    <input
+                        type="radio"
+                        id="college"
+                        name="institution_type"
+                        value="college"
+                    >
+
+                    <label for="college">
+
+                        <div class="icon">
+                            🎓
+                        </div>
+
+                        <h2>College</h2>
+
+                        <p>
+                            For colleges managing students,
+                            departments, sections and attendance.
+                        </p>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <button type="submit" class="continue-btn">
+                Continue
+            </button>
+
+        </form>
+
+
+        <div class="note">
+            You can configure your attendance settings in the next step.
+        </div>
+
+    </div>
+
+</body>
+
+<script
+    src="{{ url_for('static', filename='theme.js') }}"
+></script>
+
+</html>

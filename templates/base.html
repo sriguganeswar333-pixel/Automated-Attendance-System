@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        Automated Attendance System
+        {% endblock %}
+    </title>
+
+
+    <!-- COMMON PROJECT THEME -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='theme.css') }}"
+    >
+
+    {% block extra_css %}
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+<!-- =========================================================
+     LEFT SIDEBAR
+========================================================= -->
+
+<aside class="sidebar">
+
+    <!-- BRAND -->
+
+    <div class="sidebar-brand">
+
+        <h2>
+            🎓 Attendance
+        </h2>
+
+        <p>
+            Smart Attendance Management
+        </p>
+
+    </div>
+
+
+    <!-- NAVIGATION -->
+
+    <nav class="sidebar-navigation">
+
+
+        <!-- DASHBOARD -->
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="sidebar-link
+            {% if request.endpoint == 'dashboard' %}
+                active
+            {% endif %}"
+        >
+
+            <span class="sidebar-icon">
+                🏠
+            </span>
+
+            Dashboard
+
+        </a>
+
+
+        <!-- STUDENT MANAGEMENT -->
+
+        <a
+            href="{{ url_for('students') }}"
+            class="sidebar-link
+            {% if request.endpoint == 'students' %}
+                active
+            {% endif %}"
+        >
+
+            <span class="sidebar-icon">
+                👨‍🎓
+            </span>
+
+            Student Management
+
+        </a>
+
+
+        <!-- ADD STUDENT -->
+
+        <a
+            href="{{ url_for('add_student') }}"
+            class="sidebar-link
+            {% if request.endpoint == 'add_student' %}
+                active
+            {% endif %}"
+        >
+
+            <span class="sidebar-icon">
+                ➕
+            </span>
+
+            Add Student
+
+        </a>
+
+
+        <!-- TAKE ATTENDANCE -->
+
+        <a
+            href="{{ url_for('take_attendance') }}"
+            class="sidebar-link
+            {% if request.endpoint == 'take_attendance' %}
+                active
+            {% endif %}"
+        >
+
+            <span class="sidebar-icon">
+                📷
+            </span>
+
+            Take Attendance
+
+        </a>
+
+
+        <!-- ATTENDANCE REPORTS -->
+
+        <a
+            href="{{ url_for('attendance_reports') }}"
+            class="sidebar-link
+            {% if request.endpoint == 'attendance_reports' %}
+                active
+            {% endif %}"
+        >
+
+            <span class="sidebar-icon">
+                📊
+            </span>
+
+            Attendance Reports
+
+        </a>
+
+
+        <!-- ATTENDANCE SCHEDULE -->
+
+        <a
+            href="{{ url_for('attendance_setup') }}"
+            class="sidebar-link
+            {% if request.endpoint == 'attendance_setup' %}
+                active
+            {% endif %}"
+        >
+
+            <span class="sidebar-icon">
+                ⚙️
+            </span>
+
+            Attendance Schedule
+
+        </a>
+
+
+    </nav>
+
+
+    <!-- =====================================================
+         SIDEBAR BOTTOM
+    ====================================================== -->
+
+    <div class="sidebar-bottom">
+
+
+        <!-- THEME BUTTON -->
+
+        <button
+            type="button"
+            id="theme-toggle"
+            class="theme-toggle"
+            aria-label="Toggle theme"
+        >
+
+            <span id="theme-icon">
+                🌙
+            </span>
+
+            <span id="theme-text">
+                Dark Mode
+            </span>
+
+        </button>
+
+
+        <!-- LOGOUT -->
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="logout-button"
+        >
+
+            <span class="sidebar-icon">
+                🚪
+            </span>
+
+            Logout
+
+        </a>
+
+
+    </div>
+
+</aside>
+
+
+<!-- =========================================================
+     MAIN CONTENT
+========================================================= -->
+
+<main class="main-content">
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+
+<!-- COMMON THEME SCRIPT -->
+
+<script
+    src="{{ url_for('static', filename='theme.js') }}"
+></script>
+
+
+{% block extra_js %}
+{% endblock %}
+
+</body>
+
+</html>

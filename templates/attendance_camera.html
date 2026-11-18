@@ -112,6 +112,10 @@
         }
 
     </style>
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='theme.css') }}"
+>
 
 </head>
 
@@ -429,5 +433,9 @@ function showMessage(
 
 
 </body>
+
+<script
+    src="{{ url_for('static', filename='theme.js') }}"
+></script>
 
 </html>
